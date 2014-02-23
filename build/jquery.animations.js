@@ -8,6 +8,7 @@
  * http://www.opensource.org/licenses/MIT
  */
 ;(function($, window, document, undefined) {
+  var animationstart = 'animationstart webkitAnimationStart oAnimationStart';
   var animationend = 'animationend webkitAnimationEnd oAnimationEnd';
   var vendorPrefix = '';
   $(['WebkitTransform', 'MozTransform', 'msTransform', 'OTransform']).each(function(i, v) {
@@ -30,6 +31,7 @@
     this.element = $(element);
     this.options = options;
     this.name = this.options.animation;
+    this.success = false;
   }
 
   AnimationHandler.prototype.animate = function() {
@@ -69,11 +71,15 @@
     element.css('animation', properties);
     element.css(vendorPrefix + 'animation', properties);
 
+    this.animationStart = this.animationStart.bind(this);
     this.animationEnd = this.animationEnd.bind(this);
     this.animationCancel = this.animationCancel.bind(this);
+    element.on(animationstart, this.animationStart);
     element.on(animationend, this.animationEnd);
     element.on('animationfinish', this.animationEnd);
     element.on('animationcancel', this.animationCancel);
+    element.on('animationfail', this.animationCancel);
+    setTimeout(this.testRunning.bind(this), options.delay + 100);
   };
 
   AnimationHandler.prototype.wrap = function() {
@@ -124,6 +130,16 @@
     return css;
   };
 
+  AnimationHandler.prototype.testRunning = function(e) {
+    if(this.success)
+      return;
+    (this.wrapper || this.element).trigger('animationfail');
+  };
+
+  AnimationHandler.prototype.animationStart = function(e) {
+    this.success = true;
+  };
+
   AnimationHandler.prototype.animationEnd = function(e) {
     this.success = true;
     if(this.checkBatch())
@@ -136,6 +152,8 @@
     this.success = false;
     if(this.checkBatch())
       this.finish();
+    if(e.type == 'animationfail')
+      e.stopPropagation();
   };
 
   AnimationHandler.prototype.checkBatch = function() {
@@ -180,9 +198,11 @@
     var element = this.wrapper || this.element;
     element.removeAttr('animating');
     element.removeAttr('batchId');
+    element.off(animationstart, this.animationStart);
     element.off(animationend, this.animationEnd);
     element.off('animationfinish', this.animationEnd);
     element.off('animationcancel', this.animationCancel);
+    element.off('animationfail', this.animationCancel);
     element.css('animation', '');
     element.css(vendorPrefix + 'animation', '');
     if(this.style)
@@ -251,10 +271,11 @@
     for(var i = 0;i < animationIds.length;++i)
     {
       var animationId = animationIds[i];
-      if(!$.animations[animationId])
-        continue;
+      var animation = $.animations[animationId];
+      if(!animation)
+        animation = {name: animationId};
       options.id = animationId;
-      createHandler(this, $.animations[animationId], options, custom[animationId] || {});
+      createHandler(this, animation, options, custom[animationId] || {});
       delete options.start;
       delete options.complete;
       delete options.always;
@@ -264,10 +285,14 @@
 
   var origAnimate = $.fn.animate;
   $.fn.animate = function(param1, param2) {
-    if(typeof param1 == 'string' || 
-       typeof param1 == 'object' && (param1.name || param1.keyframes))
+    if(typeof param1 == 'string')
     {
       animate.call(this, param1, param2);
+      return;
+    }
+    else if(typeof param1 == 'object' && (param1.name || param1.keyframes))
+    {
+      createHandler(this, param1, {}, {});
       return;
     }
     return origAnimate.apply(this, arguments);
@@ -381,7 +406,7 @@
   };
 
   $.animations['shake'] = {
-    duration: 2000,
+    duration: 1000,
     keyframes: keyframes,
     variables: {
       strength: 10
