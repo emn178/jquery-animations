@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Jquery-animations : A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Jquery-animations</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/emn178/jquery-animations">View on GitHub</a>
+
+          <h1 id="project_title">Jquery-animations</h1>
+          <h2 id="project_tagline">A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/emn178/jquery-animations/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/emn178/jquery-animations/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="jquery-animations" class="anchor" href="#jquery-animations"><span class="octicon octicon-link"></span></a>jQuery-animations</h1>
+
+<p>A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use.</p>
+
+<p>For the end user, it could be easy to use jQuery method to call and use the animations predefined.</p>
+
+<p>For the developer, it could be easy to develop cross browser CSS3 animations by using JavaScript.</p>
+
+<h2>
+<a name="download" class="anchor" href="#download"><span class="octicon octicon-link"></span></a>Download</h2>
+
+<p><a href="https://raw.github.com/emn178/jquery-animations/master/build/jquery.animations.min.js">Compress</a><br><a href="https://raw.github.com/emn178/jquery-animations/master/build/jquery.animations.js">Uncompress</a></p>
+
+<h2>
+<a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h2>
+
+<p><a href="http://emn178.github.io/jquery-animations/samples/effects/">Effects</a></p>
+
+<h2>
+<a name="browser-support" class="anchor" href="#browser-support"><span class="octicon octicon-link"></span></a>Browser Support</h2>
+
+<p>jQuery-animations currently supports IE10+, Chrome, Firefox, Safari and Opera.</p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<h3>
+<a name="methods" class="anchor" href="#methods"><span class="octicon octicon-link"></span></a>Methods</h3>
+
+<h4>
+<a name="animatename-options" class="anchor" href="#animatename-options"><span class="octicon octicon-link"></span></a>animate(name, [options])</h4>
+
+<p>Perform CSS3 animations. This method extends from <a href="https://api.jquery.com/animate/">jQuery.animate()</a>, so the options naming follows the its.</p>
+
+<h5>
+<a name="name-string" class="anchor" href="#name-string"><span class="octicon octicon-link"></span></a><em>name: <code>String</code></em>
+</h5>
+
+<p>Sets the animation name(s) you want to perform. It could be a mutiple animations by including each one separated by a space.</p>
+
+<p>Available animations please refer <a href="http://emn178.github.io/jquery-animations/samples/effects/">Effects</a>.</p>
+
+<h5>
+<a name="options-object" class="anchor" href="#options-object"><span class="octicon octicon-link"></span></a><em>options: <code>Object</code></em>
+</h5>
+
+<p>Sets the customized options.</p>
+
+<h6>
+<a name="duration-number-default-animation-define-or-400" class="anchor" href="#duration-number-default-animation-define-or-400"><span class="octicon octicon-link"></span></a><em>duration: <code>Number</code> (default: animation define or <code>400</code>)</em>
+</h6>
+
+<p>Sets the number determining how long the animation will run(ms).</p>
+
+<h6>
+<a name="delay-number-default-animation-define-or-0" class="anchor" href="#delay-number-default-animation-define-or-0"><span class="octicon octicon-link"></span></a><em>delay: <code>Number</code> (default: animation define or <code>0</code>)</em>
+</h6>
+
+<p>Sets the number determining when the animation will start.(ms).</p>
+
+<h6>
+<a name="repeat-number-or-string-default-animation-define-or-1" class="anchor" href="#repeat-number-or-string-default-animation-define-or-1"><span class="octicon octicon-link"></span></a><em>repeat: <code>Number</code> or <code>String</code> (default: animation define or <code>1</code>)</em>
+</h6>
+
+<p>Sets the number determining the number of times an animation is played.</p>
+
+<p>Available values please refer <a href="http://www.w3schools.com/cssref/css3_pr_animation-iteration-count.asp">animation-iteration-count</a></p>
+
+<h6>
+<a name="easing-string-default-animation-define-or-ease" class="anchor" href="#easing-string-default-animation-define-or-ease"><span class="octicon octicon-link"></span></a><em>easing: <code>String</code> (default: animation define or <code>ease</code>)</em>
+</h6>
+
+<p>Sets the easing function to use for the transition.</p>
+
+<p>Available values please refer <a href="http://www.w3schools.com/cssref/css3_pr_animation-timing-function.asp">animation-timing-function</a></p>
+
+<h6>
+<a name="complete-functionoptions" class="anchor" href="#complete-functionoptions"><span class="octicon octicon-link"></span></a><em>complete: <code>Function(options)</code></em>
+</h6>
+
+<p>Sets the callback function to call once the animation is complete.</p>
+
+<h6>
+<a name="start-functionoptions" class="anchor" href="#start-functionoptions"><span class="octicon octicon-link"></span></a><em>start: <code>Function(options)</code></em>
+</h6>
+
+<p>Sets the callback function to call once the animation begins..</p>
+
+<h6>
+<a name="fail-functionoptions" class="anchor" href="#fail-functionoptions"><span class="octicon octicon-link"></span></a><em>fail: <code>Function(options)</code></em>
+</h6>
+
+<p>Sets the callback function to call when the animation fails to complete .</p>
+
+<h6>
+<a name="always-functionoptions" class="anchor" href="#always-functionoptions"><span class="octicon octicon-link"></span></a><em>always: <code>Function(options)</code></em>
+</h6>
+
+<p>Sets the callback function to call when the animation completes or stops without completing.</p>
+
+<h4>
+<a name="finish" class="anchor" href="#finish"><span class="octicon octicon-link"></span></a>finish()</h4>
+
+<p>Stop CSS3 animations and trigger complete event. This method extends from <a href="https://api.jquery.com/finish/">jQuery.finish()</a></p>
+
+<h4>
+<a name="stop" class="anchor" href="#stop"><span class="octicon octicon-link"></span></a>stop()</h4>
+
+<p>Stop CSS3 animations and trigger fail event. This method extends from <a href="https://api.jquery.com/stop/">jQuery.stop()</a></p>
+
+<h2>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<p>HTML</p>
+
+<div class="highlight highlight-HTML"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"#want-to-animate"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+
+<p>JavaScript</p>
+
+<div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">(</span><span class="s1">'shake'</span><span class="p">);</span>
+</pre></div>
+
+<p>You can also combine multiple animations</p>
+
+<div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">(</span><span class="s1">'flyToUp flyToRight fadeOut'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">complete</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="developer-documentation" class="anchor" href="#developer-documentation"><span class="octicon octicon-link"></span></a>Developer Documentation</h2>
+
+<p>Coming soon.</p>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>The project is released under the <a href="http://www.opensource.org/licenses/MIT">MIT license</a>.</p>
+
+<h2>
+<a name="contact" class="anchor" href="#contact"><span class="octicon octicon-link"></span></a>Contact</h2>
+
+<p>The project's website is located at <a href="https://github.com/emn178/jquery-animations">https://github.com/emn178/jquery-animations</a><br>
+Author: <a href="mailto:emn178@gmail.com">emn178@gmail.com</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Jquery-animations maintained by <a href="https://github.com/emn178">emn178</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-44208259-3");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
