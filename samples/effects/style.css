@@ -31,19 +31,19 @@ h5 {
   margin: 20px;
 }
 
-#settings {
-  margin: 10px auto;
-  width: 80%;
-  text-align: center;
-  font-size: 20px;
-}
-
 #submit {
   background-color: transparent;
   width: 120px;
   height: 65px;
   font-size: 20px;
   padding: 20px;
+}
+
+#settings {
+  margin: 10px auto;
+  width: 80%;
+  text-align: center;
+  font-size: 20px;
 }
 
 #combine {
@@ -79,6 +79,14 @@ input:checked+.animation, .animation:hover {
   margin-right: 10px;
 }
 
+.add, .remove {
+  background-color: transparent;
+  width: 45px;
+  height: 45px;
+  font-size: 10px;
+  padding: 10px;
+}
+
 #code-block {
   margin: 10px auto;
   width: 80%;
@@ -94,6 +102,7 @@ input:checked+.animation, .animation:hover {
   padding: 20px;
   background-color: rgb(232, 232, 232);
   font-family: 'Consolas', serif;
+  white-space: pre-wrap;
 }
 
 #footer {
@@ -107,7 +116,7 @@ input:checked+.animation, .animation:hover {
   text-align: center;
 }
 
-input, .input {
+input, button, select, .input {
   margin: 10px;
   outline: none;
   -webkit-border-radius: 10px;
@@ -123,7 +132,67 @@ input {
   width: 60px;
 }
 
+select {
+  font-size: 16px;
+  height: 40px;
+  width: 120px;
+  line-height: 40px;
+}
 
-#options {
+.arrow {
+  width: 0; 
+  height: 0; 
+  display: inline-block;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.arrow-right {
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid gray;
+}
+
+.arrow-down {
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid gray;
+}
+
+.disable {
   display: none;
+}
+
+
+#showOptions {
+  display: none;
+}
+#showOptions+#options #options-wrap {
+  display: none;
+}
+#showOptions:checked+#options #options-wrap {
+  display: block;
+}
+
+#options-toggle {
+  cursor: pointer;
+}
+
+#options-toggle:before {
+  content: '';
+  width: 0; 
+  height: 0; 
+  display: inline-block;
+  cursor: pointer;
+  margin-right: 10px;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid gray;
+}
+
+#showOptions:checked+#options #options-toggle:before {
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid gray;
+  border-bottom: 0;
 }

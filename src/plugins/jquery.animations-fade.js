@@ -1,15 +1,12 @@
 ;(function($, window, document, undefined) {
   var keyframes = {
-    from: {
-      opacity: 0
-    },
-    to: {
-      opacity: 1
-    }
+    from: { opacity: 0 },
+    to: { opacity: 1 }
   };
 
   var animation = {
     duration: 1000,
+    easing: 'linear',
     keyframes: keyframes
   };
 
