@@ -10,7 +10,8 @@ For the developer, it could be easy to develop cross browser CSS3 animations by 
 [Uncompress](https://raw.github.com/emn178/jquery-animations/master/build/jquery.animations.js)
 
 ## Demo
-[Effects](http://emn178.github.io/jquery-animations/samples/effects/)
+[Effects](http://emn178.github.io/jquery-animations/samples/effects/)  
+[Integrate with CSS Library](http://jsfiddle.net/emn178/vN8V8/)
 
 ## Browser Support
 jQuery-animations currently supports IE10+, Chrome, Firefox, Safari and Opera.

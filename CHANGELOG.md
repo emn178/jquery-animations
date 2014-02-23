@@ -1,3 +1,8 @@
+# v0.1.2 / 2014-02-23
+
+* Support external css library.
+* Support inline animation.
+
 # v0.1.1 / 2014-02-23
 
 * Remove batch events when complete.
