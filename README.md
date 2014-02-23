@@ -1,5 +1,9 @@
 # jQuery-animations
-A jQuery plugin provides CSS3 animations and develop framework.
+A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use.
+
+For the end user, it could be easy to use jQuery method to call and use the animations predefined.
+
+For the developer, it could be easy to develop cross browser CSS3 animations by using JavaScript.
 
 ## Download
 [Compress](https://raw.github.com/emn178/jquery-animations/master/build/jquery.animations.min.js)  
@@ -13,7 +17,7 @@ jQuery-animations currently supports IE10+, Chrome, Firefox, Safari and Opera.
 
 ## Usage
 ### Methods
-#### .animate(name, [options])
+#### animate(name, [options])
 Perform CSS3 animations. This method extends from [jQuery.animate()](https://api.jquery.com/animate/), so the options naming follows the its.
 
 ##### *name: `String`*
@@ -53,12 +57,10 @@ Sets the callback function to call when the animation fails to complete .
 ###### *always: `Function(options)`*
 Sets the callback function to call when the animation completes or stops without completing.
 
-### Methods
-#### .finish()
+#### finish()
 Stop CSS3 animations and trigger complete event. This method extends from [jQuery.finish()](https://api.jquery.com/finish/)
 
-### Methods
-#### .stop()
+#### stop()
 Stop CSS3 animations and trigger fail event. This method extends from [jQuery.stop()](https://api.jquery.com/stop/)
 
 ## Example
@@ -71,7 +73,6 @@ HTML
 JavaScript
 ```JavaScript
 $('#want-to-animate').animate('shake');
-$('#want-to-animate').stop();
 ```
 You can also combine multiple animations
 ```JavaScript
@@ -81,6 +82,9 @@ $('#want-to-animate').animate('flyToUp flyToRight fadeOut', {
   }
 });
 ```
+
+## Developer Documentation
+Coming soon.
 
 ## License
 The project is released under the [MIT license](http://www.opensource.org/licenses/MIT).

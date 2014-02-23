@@ -1,7 +1,7 @@
 {
   "name": "jQuery-animations",
   "version": "0.1.0",
-  "description": "A jQuery plugin provides CSS3 animations and develop framework.",
+  "description": "A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use.",
   "main": "src/jquery-animations.js",
   "repository": {
     "type": "git",
