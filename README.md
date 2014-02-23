@@ -40,7 +40,7 @@ Sets the number determining the number of times an animation is played.
 
 Available values please refer to [animation-iteration-count](http://www.w3schools.com/cssref/css3_pr_animation-iteration-count.asp)
 
-###### *easing: `String` (default: animation define or `ease`)*
+###### *easing: `String` (default: animation define or `"ease"`)*
 Sets the easing function to use for the transition.
 
 Available values please refer to [animation-timing-function](http://www.w3schools.com/cssref/css3_pr_animation-timing-function.asp)

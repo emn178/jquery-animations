@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.1.0
+ * jQuery-animations v0.1.1
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -124,10 +124,12 @@
     return css;
   };
 
-  AnimationHandler.prototype.animationEnd = function() {
+  AnimationHandler.prototype.animationEnd = function(e) {
     this.success = true;
     if(this.checkBatch())
       this.finish();
+    if(e.type != 'animationfinish')
+      e.stopPropagation();
   };
 
   AnimationHandler.prototype.animationCancel = function() {
@@ -160,6 +162,7 @@
           continue;
         var cb = batch[hid]();
       }
+      delete batches[this.batchId];
       return true;
     }
     batch[this.id] = this.finish.bind(this);
@@ -209,9 +212,9 @@
       wrapper.css('display', 'inline-block');
   }
 
-  function createHandler(elements, animation, options)
+  function createHandler(elements, animation, options, customOptions)
   {
-    options = $.extend({}, options);
+    options = $.extend({}, options, customOptions);
     options.duration = options.duration || animation.duration || 400;
     options.direction = options.direction || animation.direction || 'normal';
     options.easing = options.easing || animation.easing || 'ease';
@@ -238,21 +241,24 @@
     wrap: wrap
   };
   
-  function animate(name, options)
+  function animate(animationId, options)
   {
     options = options || {};
-    var names = name.split(' ');
-    options.overlay = names.length > 1;
-    for(var i = 0;i < names.length;++i)
+    var animationIds = animationId.split(' ');
+    options.overlay = options.overlay || animationIds.length > 1;
+    var custom = options.custom || {};
+    delete options.custom;
+    for(var i = 0;i < animationIds.length;++i)
     {
-      var name = names[i];
-      if(!$.animations[name])
-        return;
-      createHandler(this, $.animations[name], options);
-      options.start = null;
-      options.complete = null;
-      options.always = null;
-      options.fail = null;
+      var animationId = animationIds[i];
+      if(!$.animations[animationId])
+        continue;
+      options.id = animationId;
+      createHandler(this, $.animations[animationId], options, custom[animationId] || {});
+      delete options.start;
+      delete options.complete;
+      delete options.always;
+      delete options.fail;
     }
   }
 
@@ -284,30 +290,34 @@
 ;;(function($, window, document, undefined) {
   var keyframes = {
     '0%, 20%, 50%, 80%, 100%': { transform: 'translateY(0)' },
-    '40%': { transform: 'translateY(-${strength}px)' },
-    '60%': { transform: 'translateY(-${strength}px)' }
-  }
+    '40%': { transform: 'translateY(${strength1}px)' },
+    '60%': { transform: 'translateY(${strength2}px)' }
+  };
 
   $.animations['bounce'] = {
     duration: 1000,
     keyframes: keyframes,
     variables: {
       strength: 20
+    },
+    start: function(options) {
+      var strength = options.variables.strength;
+      if(!$.isNumeric(options.variables.strength))
+        strength = 20;
+      options.variables.strength1 = -strength * 2;
+      options.variables.strength2 = -strength;
     }
   };
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   var keyframes = {
-    from: {
-      opacity: 0
-    },
-    to: {
-      opacity: 1
-    }
+    from: { opacity: 0 },
+    to: { opacity: 1 }
   };
 
   var animation = {
     duration: 1000,
+    easing: 'linear',
     keyframes: keyframes
   };
 
@@ -318,28 +328,41 @@
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   var keyframes = {
-    up: {
-      from: { transform: 'translateY(-${distance}px)' },
-      to: { transform: 'translateY(0)' }
-    },
-    down: {
-      from: { transform: 'translateY(${distance}px)' },
-      to: { transform: 'translateY(0)' }
-    },
-    left: {
-      from: { transform: 'translateX(-${distance}px)' },
-      to: { transform: 'translateX(0)' }
-    },
-    right: {
-      from: { transform: 'translateX(${distance}px)' },
-      to: { transform: 'translateX(0)' }
-    }
+    from: { transform: 'translate${axis}(${distance}px)' },
+    to: { transform: 'translate${axis}(0)' }
   };
 
   var animation = {
     duration: 1000,
+    keyframes: keyframes,
     variables: {
-      distance: 500
+      distance: null
+    },
+    start: function(options) {
+      var variables = options.variables;
+      var distance;
+      if(variables.distance && $.isNumeric(variables.distance))
+        distance = variables.distance;
+      var direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
+      switch(direction)
+      {
+        case 'up':
+          variables.axis = 'Y';
+          variables.distance = distance || -$(window).height();
+          break;
+        case 'down':
+          variables.axis = 'Y';
+          variables.distance = distance || $(document).height();
+          break;
+        case 'left':
+          variables.axis = 'X';
+          variables.distance = distance || -$(window).width();
+          break;
+        case 'right':
+          variables.axis = 'X';
+          variables.distance = distance || $(document).width();
+          break;
+      }
     }
   };
 
@@ -348,58 +371,77 @@
     $.animations[name] = $.extend({}, animation);
     if(name.indexOf('To') != -1)
       $.animations[name].direction = 'reverse';
-    $.animations[name].keyframes = keyframes[name.match(/(From|To)(.*)$/)[2].toLowerCase()];
   });
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   var keyframes = {
     '0%, 100%': { transform: 'translateX(0)' },
-    '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-${strength}px)' },
-    '20%, 40%, 60%, 80%': { transform: 'translateX(${strength}px)' }
-  }
+    '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(${strength1}px)' },
+    '20%, 40%, 60%, 80%': { transform: 'translateX(${strength2}px)' }
+  };
 
   $.animations['shake'] = {
-    duration: 1000,
+    duration: 2000,
     keyframes: keyframes,
     variables: {
       strength: 10
+    },
+    start: function(options) {
+      var strength = options.variables.strength;
+      if(!$.isNumeric(options.variables.strength))
+        strength = 10;
+      options.variables.strength1 = -strength;
+      options.variables.strength2 = strength;
     }
   };
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   var keyframes = {
-    up: {
-      from: { transform: 'translateY(-${distance}px)' },
-      to: { transform: 'translateY(0)' }
-    },
-    down: {
-      from: { transform: 'translateY(${distance}px)' },
-      to: { transform: 'translateY(0)' }
-    },
-    left: {
-      from: { transform: 'translateX(-${distance}px)' },
-      to: { transform: 'translateX(0)' }
-    },
-    right: {
-      from: { transform: 'translateX(${distance}px)' },
-      to: { transform: 'translateX(0)' }
-    }
+    from: { transform: 'translate${axis}(${distance}px)' },
+    to: { transform: 'translate${axis}(0)' }
   };
 
   var animation = {
     duration: 1000,
+    keyframes: keyframes,
     variables: {
-      distance: 500
+      distance: null
     },
     start: function(options) {
       var element = $(this);
       var wrapper = $('<span></span>');
       $.animations.fn.wrap(element, wrapper);
       wrapper.css('overflow', 'hidden');
-      wrapper.width(element.width());
-      wrapper.height(element.height());
+      var w = element.width();
+      var h = element.height();
+      wrapper.width(w);
+      wrapper.height(h);
       element.wrap(wrapper);
       options.wrapper = element.parent();
+      var variables = options.variables;
+      var distance;
+      if(variables.distance && $.isNumeric(variables.distance))
+        distance = variables.distance;
+      var direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
+      switch(direction)
+      {
+        case 'up':
+          variables.axis = 'Y';
+          options.variables.distance = distance || -h;
+          break;
+        case 'down':
+          variables.axis = 'Y';
+          options.variables.distance = distance || h;
+          break;
+        case 'left':
+          variables.axis = 'X';
+          options.variables.distance = distance || -w;
+          break;
+        case 'right':
+          variables.axis = 'X';
+          options.variables.distance = distance || w;
+          break;
+      }
     },
     always: function(options) {
       options.wrapper.children().first().unwrap();
@@ -411,6 +453,5 @@
     $.animations[name] = $.extend({}, animation);
     if(name.indexOf('To') != -1)
       $.animations[name].direction = 'reverse';
-    $.animations[name].keyframes = keyframes[name.match(/(From|To)(.*)$/)[2].toLowerCase()];
   });
 })(jQuery, window, document);
