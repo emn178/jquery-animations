@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Predefined Animations</title>
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css">
+  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script type="text/javascript" src="../../src/jquery.animations.js"></script>
+  <script type="text/javascript" src="../../src/plugins/jquery.animations-fade.js"></script>
+  <script type="text/javascript" src="../../src/plugins/jquery.animations-shake.js"></script>
+  <script type="text/javascript" src="../../src/plugins/jquery.animations-bounce.js"></script>
+  <script type="text/javascript" src="../../src/plugins/jquery.animations-slide.js"></script>
+  <script type="text/javascript" src="../../src/plugins/jquery.animations-fly.js"></script>
+  <script type="text/javascript" src="app.js"></script>
+</head>
+<body>
+  <div id="header">
+    <h1>Predefined Animations</h1>
+  </div>
+  <div id="body">
+    <div id="description">
+      <p>
+        List predefined animations. Click button to see the effect and source code.
+      </p>
+    </div>
+    <div id="container">
+      <img id="image" src="images/batman.png" />
+    </div>
+    <div id="settings">
+      <button id="submit" class="input">Animate</button>
+      <div id="animations">
+        <h3>Animations</h3>
+        <div>
+          <input id="combine" type="checkbox"/>
+          <label for="combine">Combine</label>
+        </div>
+      </div>
+      <div id="options">
+        <h3>Options</h3>
+        <div class="option-group">
+          <h5>Global</h5>
+          <label for="duration">Duration</label>
+          <input type="number" id="duration" name="duration" step="100" min="0" />
+          <label for="repeat">Repeat</label>
+          <input type="number" id="repeat" name="repeat" step="1" min="0" />
+        </div>
+      </div>
+    </div>
+    <div id="code-block">
+      <h3>Source Code</h3>
+      <pre id="code">&nbsp;</pre>
+    </div>
+  </div>
+  <div id="footer">
+    © 2014 jQuery-animations Demo and image from Wikipedia
+  </div>
+</body>
+</html>

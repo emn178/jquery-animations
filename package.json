@@ -1,0 +1,26 @@
+{
+  "name": "jQuery-animations",
+  "version": "0.1.0",
+  "description": "A jQuery plugin provides CSS3 animations and develop framework.",
+  "main": "src/jquery-animations.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emn178/jquery-animations.git"
+  },
+  "keywords": [
+    "jquery",
+    "css3",
+    "animation"
+  ],
+  "license": "MIT",
+  "author": "emn178 <emn178@gmail.com>",
+  "homepage": "https://github.com/emn178/jquery-animations",
+  "bugs": {
+    "url": "https://github.com/emn178/jquery-animations/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-contrib-concat": "~0.3.0"
+  }
+}
