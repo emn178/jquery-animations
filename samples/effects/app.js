@@ -1,7 +1,6 @@
 ;(function($, window, document, undefined) {
   var animation = '';
   var options = {};
-  var optionIds = ['duration', 'repeat'];
   var lastChecked;
 
   function animate()
@@ -9,12 +8,27 @@
     $('#image').animate(animation, options);
   }
 
+  function add(animationId)
+  {
+    var element = $('.global').clone();
+    element.removeClass('global').addClass('custom disable').attr('id', 'option-' + animationId).attr('animation-id', animationId);
+    element.find('h5').text(animationId);
+    element.find('label').each(function(){
+      $(this).attr('for', animationId + '-' + $(this).attr('for'));
+    });
+    element.find('input,select').each(function(){
+      $(this).attr('id', animationId + '-' + $(this).attr('id'));
+      $(this).val('');
+    });
+    $('#options-wrap').append(element);
+  }
+
   function update()
   {
     var isCombine = $('#combine').is(':checked');
     if(!isCombine)
     {
-      $('.animation-check:checked').filter(function(){
+      $('.animation-check:checked').filter(function() {
         if(this.id == lastChecked)
           return;
         $(this).attr('checked', false);
@@ -24,16 +38,43 @@
     animation = $.makeArray($('.animation-check:checked').map(function() {
       return $(this).attr('animation');
     })).join(' ');
+    if(!animation)
+    {
+      $('#code').text(' ');
+      return;
+    }
     options = {};
-    optionIds.forEach(function(id) {
-      var input = $('#' + id);
-      var name = input.attr('name');
-      var value = input.val();
-      if(input.attr('type') == 'number')
+    $('.global select, .global input').each(function() {
+      var element = $(this);
+      var name = element.attr('name');
+      var value = element.val();
+      if(element.attr('type') == 'number')
         value = parseInt(value);
       if(value)
         options[name] = value;
     });
+
+
+    $('.custom:not(.disable)').each(function() {
+      var custom = $(this);
+      var id = custom.attr('animation-id');
+      options.custom = options.custom || {};
+      var customOptions = options.custom[id] = {};
+      custom.find('input, select').each(function() {
+        var element = $(this);
+        var name = element.attr('name');
+        var value = element.val();
+        if(element.attr('type') == 'number')
+          value = parseInt(value);
+        if(value)
+          customOptions[name] = value;
+      });
+      if($.isEmptyObject(customOptions))
+        delete options.custom[id];
+    });
+    if($.isEmptyObject(options.custom))
+      delete options.custom;
+
     var optionsStr = JSON.stringify(options, null, 2);
     if(optionsStr == '{}')
       $('#code').text("$('#image').animate('" + animation + "');");
@@ -41,12 +82,13 @@
       $('#code').text("$('#image').animate('" + animation + "', " + optionsStr +  "');");
   }
 
-  function record()
+  function click()
   {
     var element = $('#' + $(this).attr('for'));
-    if(element.is(':checked'))
-      return;
-    lastChecked = element.attr('id');
+    var animationId = element.attr('id');
+    $('#option-' + animationId).toggleClass('disable');
+    if(!element.is(':checked'))
+      lastChecked = animationId;
   }
 
   $(document).ready(function() {
@@ -55,48 +97,14 @@
       if(key == 'fn')
         continue;
       var checkbox = $('<input type="checkbox" class="animation-check"/>');
-      var id = 'a-' + key;
-      checkbox.attr('id', id).attr('animation', key);
+      checkbox.attr('id', key).attr('animation', key);
       var label = $('<label class="animation input"></lable>');
-      label.text(key).attr('for', id).click(record);
+      label.text(key).attr('for', key).click(click);
       $('#animations').append(checkbox).append(label);
-
-      var variables = $.animations[key].variables;
-      if(!variables)
-        continue;
-      for(var variableName in variables)
-      {
-        var block = $('<div class="option-group"></div>');
-        block.append('<h5>' + key + '\'s options</h5>');
-        var type;
-        switch(typeof variables[variableName])
-        {
-          case 'number':
-            type = 'number';
-            break;
-          case 'boolean':
-            type = 'checkbox';
-            break;
-          default:
-            type = 'textbox';
-            break
-        }
-        var input = $('<input>');
-        id = 'o-' + key + '-' + variableName;
-        input.attr('type', type).attr('id', id).attr('name', variableName);
-        var label = $('<label></lable>');
-        label.text(variableName).attr('for', id);
-        optionIds.push(id);
-
-        if(type == 'checkbox')
-          block.append(input).append(label);
-        else
-          block.append(label).append(input);
-        $('#options').append(block);
-      }
+      add(key);
     }
 
     $('#submit').click(animate);
-    $('body').on('change', 'input', update);
+    $('body').on('change', 'input,select', update);
   });
 })(jQuery, window, document);

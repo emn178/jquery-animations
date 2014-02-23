@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.1.0
+ * jQuery-animations v0.1.1
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -124,10 +124,12 @@
     return css;
   };
 
-  AnimationHandler.prototype.animationEnd = function() {
+  AnimationHandler.prototype.animationEnd = function(e) {
     this.success = true;
     if(this.checkBatch())
       this.finish();
+    if(e.type != 'animationfinish')
+      e.stopPropagation();
   };
 
   AnimationHandler.prototype.animationCancel = function() {
@@ -160,6 +162,7 @@
           continue;
         var cb = batch[hid]();
       }
+      delete batches[this.batchId];
       return true;
     }
     batch[this.id] = this.finish.bind(this);
@@ -209,9 +212,9 @@
       wrapper.css('display', 'inline-block');
   }
 
-  function createHandler(elements, animation, options)
+  function createHandler(elements, animation, options, customOptions)
   {
-    options = $.extend({}, options);
+    options = $.extend({}, options, customOptions);
     options.duration = options.duration || animation.duration || 400;
     options.direction = options.direction || animation.direction || 'normal';
     options.easing = options.easing || animation.easing || 'ease';
@@ -238,21 +241,24 @@
     wrap: wrap
   };
   
-  function animate(name, options)
+  function animate(animationId, options)
   {
     options = options || {};
-    var names = name.split(' ');
-    options.overlay = names.length > 1;
-    for(var i = 0;i < names.length;++i)
+    var animationIds = animationId.split(' ');
+    options.overlay = options.overlay || animationIds.length > 1;
+    var custom = options.custom || {};
+    delete options.custom;
+    for(var i = 0;i < animationIds.length;++i)
     {
-      var name = names[i];
-      if(!$.animations[name])
-        return;
-      createHandler(this, $.animations[name], options);
-      options.start = null;
-      options.complete = null;
-      options.always = null;
-      options.fail = null;
+      var animationId = animationIds[i];
+      if(!$.animations[animationId])
+        continue;
+      options.id = animationId;
+      createHandler(this, $.animations[animationId], options, custom[animationId] || {});
+      delete options.start;
+      delete options.complete;
+      delete options.always;
+      delete options.fail;
     }
   }
 

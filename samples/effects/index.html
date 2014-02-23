@@ -28,22 +28,40 @@
       <img id="image" src="images/batman.png" />
     </div>
     <div id="settings">
-      <button id="submit" class="input">Animate</button>
+      <button id="submit">Animate</button>
       <div id="animations">
         <h3>Animations</h3>
         <div>
-          <input id="combine" type="checkbox"/>
+          <input id="combine" type="checkbox" checked="checked"/>
           <label for="combine">Combine</label>
         </div>
       </div>
+      <input id="showOptions" name="showOptions" type="checkbox"/>
       <div id="options">
-        <h3>Options</h3>
-        <div class="option-group">
-          <h5>Global</h5>
-          <label for="duration">Duration</label>
-          <input type="number" id="duration" name="duration" step="100" min="0" />
-          <label for="repeat">Repeat</label>
-          <input type="number" id="repeat" name="repeat" step="1" min="0" />
+        <h3><label id="options-toggle" for="showOptions">Options</label></h3>
+        <div id="options-wrap">
+          <div class="option-group global">
+            <h5>Global</h5>
+            <label for="duration">Duration</label>
+            <input type="number" id="duration" name="duration" step="100" min="0" />
+            <label for="delay">Delay</label>
+            <input type="number" id="delay" name="delay" step="100" min="0" />
+            <label for="repeat">Repeat</label>
+            <input type="number" id="repeat" name="repeat" step="1" min="0" />
+            <label for="easing">Easing</label>
+            <select id="easing" name="easing">
+              <option value="">Default</option>
+              <option value="linear">Linear</option>
+              <option value="ease">Ease</option>
+              <option value="ease-in">Ease In</option>
+              <option value="ease-out">Ease Out</option>
+              <option value="ease-in-out">Ease In Out</option>
+            </select>
+            <label for="strendth">*Strength</label>
+            <input type="number" id="strendth" name="strendth" step="1" min="0" />
+            <label for="distance">*Distance</label>
+            <input type="number" id="distance" name="distance" step="1" min="0" />
+          </div>
         </div>
       </div>
     </div>

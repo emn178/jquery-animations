@@ -1,27 +1,40 @@
 ;(function($, window, document, undefined) {
   var keyframes = {
-    up: {
-      from: { transform: 'translateY(-${distance}px)' },
-      to: { transform: 'translateY(0)' }
-    },
-    down: {
-      from: { transform: 'translateY(${distance}px)' },
-      to: { transform: 'translateY(0)' }
-    },
-    left: {
-      from: { transform: 'translateX(-${distance}px)' },
-      to: { transform: 'translateX(0)' }
-    },
-    right: {
-      from: { transform: 'translateX(${distance}px)' },
-      to: { transform: 'translateX(0)' }
-    }
+    from: { transform: 'translate${axis}(${distance}px)' },
+    to: { transform: 'translate${axis}(0)' }
   };
 
   var animation = {
     duration: 1000,
+    keyframes: keyframes,
     variables: {
-      distance: 500
+      distance: null
+    },
+    start: function(options) {
+      var variables = options.variables;
+      var distance;
+      if(variables.distance && $.isNumeric(variables.distance))
+        distance = variables.distance;
+      var direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
+      switch(direction)
+      {
+        case 'up':
+          variables.axis = 'Y';
+          variables.distance = distance || -$(window).height();
+          break;
+        case 'down':
+          variables.axis = 'Y';
+          variables.distance = distance || $(document).height();
+          break;
+        case 'left':
+          variables.axis = 'X';
+          variables.distance = distance || -$(window).width();
+          break;
+        case 'right':
+          variables.axis = 'X';
+          variables.distance = distance || $(document).width();
+          break;
+      }
     }
   };
 
@@ -30,6 +43,5 @@
     $.animations[name] = $.extend({}, animation);
     if(name.indexOf('To') != -1)
       $.animations[name].direction = 'reverse';
-    $.animations[name].keyframes = keyframes[name.match(/(From|To)(.*)$/)[2].toLowerCase()];
   });
 })(jQuery, window, document);
