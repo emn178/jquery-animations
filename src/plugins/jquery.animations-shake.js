@@ -6,7 +6,7 @@
   };
 
   $.animations['shake'] = {
-    duration: 2000,
+    duration: 1000,
     keyframes: keyframes,
     variables: {
       strength: 10
