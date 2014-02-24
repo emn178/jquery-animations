@@ -13,8 +13,17 @@
     var element = $('.global').clone();
     element.removeClass('global').addClass('custom disable').attr('id', 'option-' + animationId).attr('animation-id', animationId);
     element.find('h5').text(animationId);
-    element.find('label').each(function(){
-      $(this).attr('for', animationId + '-' + $(this).attr('for'));
+    var animation = $.animations[animationId];
+    element.find('label').each(function() {
+      var label = $(this);
+      var variable = label.attr('for');
+      if(label.hasClass('custom') && !(animation.variables && variable in animation.variables))
+      {
+        element.find('[name=' + variable + ']').remove();
+        label.remove();
+      }
+      else
+        label.attr('for', animationId + '-' + variable);
     });
     element.find('input,select').each(function(){
       $(this).attr('id', animationId + '-' + $(this).attr('id'));
@@ -75,11 +84,10 @@
     if($.isEmptyObject(options.custom))
       delete options.custom;
 
-    var optionsStr = JSON.stringify(options, null, 2);
-    if(optionsStr == '{}')
+    if($.isEmptyObject(options))
       $('#code').text("$('#image').animate('" + animation + "');");
     else
-      $('#code').text("$('#image').animate('" + animation + "', " + optionsStr +  "');");
+      $('#code').text("$('#image').animate('" + animation + "', " + JSON.stringify(options, null, 2) +  ");");
   }
 
   function click()

@@ -1,3 +1,7 @@
+# v0.1.3 / 2014-02-24
+
+* Fixed options unexpected modification.
+
 # v0.1.2 / 2014-02-23
 
 * Support external css library.

@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.1.1
+ * jQuery-animations v0.1.3
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -263,7 +263,7 @@
   
   function animate(animationId, options)
   {
-    options = options || {};
+    options = $.extend({}, options);
     var animationIds = animationId.split(' ');
     options.overlay = options.overlay || animationIds.length > 1;
     var custom = options.custom || {};

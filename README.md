@@ -1,7 +1,7 @@
 # jQuery-animations
 A CSS3 animation framework based on jQuery providing an easy way to develop cross browser CSS3 animations.
 
-For the user, it could be easy to use jQuery method to call and use the animations predefined.
+For the user, it could be easy to use jQuery method to perform and combine the animations.
 
 For the developer, it could be easy to develop cross browser CSS3 animations by using JavaScript.
 
@@ -19,7 +19,7 @@ jQuery-animations currently supports IE10+, Chrome, Firefox, Safari and Opera.
 ## Usage
 ### Methods
 #### animate(name, [options])
-Perform CSS3 animations. This method extends from [jQuery.animate()](https://api.jquery.com/animate/), so the options naming follows the its.
+Perform CSS3 animations. This method extends from [jQuery.animate()](https://api.jquery.com/animate/), so the options naming follows its.
 
 ##### *name: `String`*
 
