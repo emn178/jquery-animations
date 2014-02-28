@@ -12,15 +12,12 @@
     },
     start: function(options) {
       var element = $(this);
-      var wrapper = $('<span></span>');
-      $.animations.fn.wrap(element, wrapper);
+      var wrapper = $.wrap(element, $('<span></span>'));
       wrapper.css('overflow', 'hidden');
       var w = element.width();
       var h = element.height();
       wrapper.width(w);
       wrapper.height(h);
-      element.wrap(wrapper);
-      options.wrapper = element.parent();
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
@@ -45,9 +42,6 @@
           options.variables.distance = distance || w;
           break;
       }
-    },
-    always: function(options) {
-      options.wrapper.children().first().unwrap();
     }
   };
 
