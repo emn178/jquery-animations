@@ -20,7 +20,7 @@
       {
         case 'up':
           variables.axis = 'Y';
-          variables.distance = distance || -$(window).height();
+          variables.distance = distance || -$(document).height();
           break;
         case 'down':
           variables.axis = 'Y';
@@ -28,7 +28,7 @@
           break;
         case 'left':
           variables.axis = 'X';
-          variables.distance = distance || -$(window).width();
+          variables.distance = distance || -$(document).width();
           break;
         case 'right':
           variables.axis = 'X';

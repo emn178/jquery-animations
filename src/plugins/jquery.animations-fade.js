@@ -1,13 +1,13 @@
 ;(function($, window, document, undefined) {
-  var keyframes = {
+  $.defineAnimation('fadeIn', {
     from: { opacity: 0 },
     to: { opacity: 1 }
-  };
+  });
 
   var animation = {
+    name: 'fadeIn',
     duration: 1000,
-    easing: 'linear',
-    keyframes: keyframes
+    easing: 'linear'
   };
 
   $.animations['fadeIn'] = animation;

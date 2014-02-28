@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.1.3
+ * jQuery-animations v0.2.0
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -21,45 +21,175 @@
   var supportFlex = testElement.style.display == 'inline-flex';
   testElement = null;
 
-  var batches = {};
   var id = 0;
+  var observations = [];
 
-  function AnimationHandler(element, options)
+  function Action(elements, animations, options)
   {
-    this.id = ++id;
-    this.batchId = this.id;
-    this.element = $(element);
+    this.elements = elements;
+    this.animations = animations;
     this.options = options;
-    this.name = this.options.animation;
-    this.success = false;
   }
 
-  AnimationHandler.prototype.animate = function() {
-    var element = this.element;
-    var options = this.options;
+  Action.prototype.start = function() {
+    this.prepare();
+    this.elements.each(function(i, element) {
+      new Task(element, this.taskOptions, this.jobsOptions).start();
+    }.bind(this));
+  };
 
-    if(element.attr('animating') == '1')
+  Action.prototype.prepare = function() {
+    this.taskOptions = $.extend({}, this.options);
+    this.jobsOptions = [];
+    var custom = this.taskOptions.custom || {};
+    for(var i = 0;i < this.animations.length;++i)
     {
-      if(options.overlay)
+      // prepare options
+      var animation = this.animations[i];
+      var options = $.extend({}, this.taskOptions, custom[animation.id]);
+      options.id = animation.id;
+      options.duration = options.duration || animation.duration || 400;
+      options.direction = options.direction || animation.direction || 'normal';
+      options.easing = options.easing || animation.easing || 'ease';
+      options.delay = options.delay || animation.delay || 0;
+      options.repeat = options.repeat || animation.repeat || 1;
+      options.fillMode = options.fillMode || animation.fillMode || 'none';
+      options.timeout = options.timeout || 500;
+      options.start = animation.start;
+      options.complete = animation.complete;
+      options.always = animation.always;
+      options.fail = animation.fail;
+      options.name = animation.name;
+      options.keyframes = animation.keyframes;
+      options.variables = {};
+      for(var variableName in animation.variables)
+        options.variables[variableName] = options[variableName] || animation.variables[variableName];
+      this.jobsOptions.push(options);
+    } 
+  };
+
+  function Task(element, options, jobsOptions)
+  {
+    this.element = $(element);
+    this.options = options;
+    this.jobsOptions = jobsOptions;
+    this.counter = {
+      complete: 0,
+      fail: 0,
+      always: 0
+    };
+  }
+
+  Task.prototype.start = function() {
+    if(!this.options.overlay)
+      this.element.trigger('animationcancel');
+
+    var tasks = parseInt(this.element.attr('animation-tasks')) || 0;
+    if(!tasks)
+      this.cleaner = true;
+    ++tasks;
+    this.element.attr('animation-tasks', tasks);
+    this.ontasksend = this.ontasksend.bind(this);
+    this.element.on('tasksend', this.ontasksend);
+
+    this.actor = this.element;
+    var css = '';
+    var jobs = [];
+    for(var i = 0;i < this.jobsOptions.length;++i)
+    {
+      this.actor = wrap(this.actor, $('<span></span>'));
+      var options = $.extend({}, this.jobsOptions[i]);
+
+      callback(options.start, this.actor, [options])
+      if(options.keyframes)
       {
-        this.wrap();
-        element = this.wrapper;
+        options.name = 'a' + ++id;
+        css += generateKeyframeCss({
+          name: options.name,
+          keyframes: options.keyframes,
+          variables: options.variables
+        });
       }
-      else
-        element.trigger('animationcancel');
+
+      options.complete = [options.complete, this.oncomplete.bind(this)];
+      options.fail = [options.fail, this.onfail.bind(this)];
+      options.always = [options.always, this.onalways.bind(this)];
+      jobs.push(new Job(this.actor, options));
     }
+
+    this.style = $('<style></style>');
+    this.style.html(css);
+    $('head').append(this.style);
+
+    for(var i = 0;i < jobs.length;++i)
+      jobs[i].start();
+  };
+
+  Task.prototype.oncomplete = function() {
+    ++this.counter.complete;
+  };
+
+  Task.prototype.onfail = function() {
+    ++this.counter.fail;
+  };
+
+  Task.prototype.onalways = function() {
+    ++this.counter.always;
+    if(!this.isDone())
+      return;
+    var tasks = parseInt(this.element.attr('animation-tasks')) || 0;
+    if(tasks == 1)
+      this.element.removeAttr('animation-tasks');
     else
-      element.attr('batchId', this.id)
-    element.attr('animating', 1);
+      this.element.attr('animation-tasks', tasks - 1);
+    if(tasks == 1 && !this.hasOtherTasks())
+      this.element.trigger('tasksend');
+  };
 
-    callback(options.start, element[0], [options]);
+  Task.prototype.ontasksend = function() {
+    if(!this.isDone())
+      return;
+    this.clear();
+    if(this.counter.complete > 0)
+      callback(this.options.complete, this.element, [this.options]);
+    if(this.counter.fail == this.counter.always)
+      callback(this.options.fail, this.element, [this.options]);
+    callback(this.options.always, this.element, [this.options]);
+  };
 
-    if(this.options.keyframes)
-      this.createKeyframesStyle();
+  Task.prototype.isDone = function() {
+    return this.counter.always == this.jobsOptions.length
+  };
+
+  Task.prototype.hasOtherTasks = function() {
+    return this.element.find('[animation-tasks]').length > 0;
+  };
+
+  Task.prototype.clear = function() {
+    this.element.off('tasksend');
+    this.style.remove();
+    if(!this.cleaner)
+      return;
+    var wrapper = this.actor;
+    while(wrapper.parent().attr('animation-wrapper') == 1)
+      wrapper = wrapper.parent();
+    if(wrapper != this.element)
+      wrapper.replaceWith(this.element);
+  };
+
+  function Job(element, options)
+  {
+    this.element = $(element);
+    this.options = options;
+  }
+
+  Job.prototype.start = function() {
+    var options = this.options;
+    var element = this.element;
 
     // name duration timing-function delay iteration-count direction fill-mode play-state
     var properties = [
-      this.name, 
+      options.name, 
       options.duration / 1000 + 's', 
       options.easing, 
       options.delay / 1000 + 's', 
@@ -71,41 +201,119 @@
     element.css('animation', properties);
     element.css(vendorPrefix + 'animation', properties);
 
-    this.animationStart = this.animationStart.bind(this);
-    this.animationEnd = this.animationEnd.bind(this);
-    this.animationCancel = this.animationCancel.bind(this);
-    element.on(animationstart, this.animationStart);
-    element.on(animationend, this.animationEnd);
-    element.on('animationfinish', this.animationEnd);
-    element.on('animationcancel', this.animationCancel);
-    element.on('animationfail', this.animationCancel);
-    setTimeout(this.testRunning.bind(this), options.delay + 100);
+    this.onstart = this.onstart.bind(this);
+    this.onend = this.onend.bind(this);
+    this.onfail = this.onfail.bind(this);
+    this.oncancel = this.oncancel.bind(this);
+    this.onfinish = this.onfinish.bind(this);
+    element.on(animationstart, this.onstart);
+    element.on(animationend, this.onend);
+    element.on('animationfail', this.onfail);
+    element.on('animationcancel', this.oncancel);
+    element.on('animationfinish', this.onfinish);
+    observe(element, new Date().getTime() + options.delay + options.timeout);
   };
 
-  AnimationHandler.prototype.wrap = function() {
-    this.batchId = this.element.attr('batchId');
-    if(!batches[this.batchId])
-    {
-      batches[this.batchId] = {};
-      batches[this.batchId][this.batchId] = 0;
-    }
-    batches[this.batchId][this.id] = 0;
-    this.element.wrap($('<span></span>'));
-    this.wrapper = this.element.parent();
-    wrap(this.element, this.wrapper);
+  Job.prototype.onstart = function(e) {
+    unobserve(this.element);
   };
 
-  AnimationHandler.prototype.createKeyframesStyle = function() {
-    this.name = 'a' + this.id;
-    this.style = $('<style/>');
-    this.style.append(this.getKeyframeCss('')).append(this.getKeyframeCss(vendorPrefix));
-    $('head').append(this.style);
+  Job.prototype.onfail = function(e) {
+    e.stopPropagation();
+    this.finish(false);
   };
 
-  AnimationHandler.prototype.getKeyframeCss = function(prefix) {
+  Job.prototype.oncancel = function(e) {
+    this.finish(false);
+  };
+
+  Job.prototype.onend = function(e) {
+    e.stopPropagation();
+    this.finish(true);
+  };
+
+  Job.prototype.onfinish = function(e) {
+    this.finish(true);
+  };
+
+  Job.prototype.finish = function(success) {
     var options = this.options;
+    var element = this.element;
+    element.off(animationstart, this.onstart);
+    element.off(animationend, this.onend);
+    element.off('animationfail', this.onfail);
+    element.off('animationcancel', this.oncancel);
+    element.off('animationfinish', this.onfinish);
+    element.css('animation', '');
+    element.css(vendorPrefix + 'animation', '');
+    callback(success ? options.complete : options.fail, this.element[0], [options]);
+    callback(options.always, this.element[0], [this.options]);
+  }
+
+  function checkFail()
+  {
+    var remains = [];
+    var now = new Date().getTime();
+    for(var i = 0;i < observations.length;++i)
+    {
+      var observation = observations[i];
+      var deadline = observation.attr('animation-deadline');
+      if(!deadline)
+        continue;
+      deadline = parseInt(deadline);
+      if(now > deadline)
+      {
+        observation.removeAttr('animation-deadline');
+        observation.trigger('animationfail');
+      }
+      else
+        remains.push(observation);
+    }
+    observations = remains;
+  }
+
+  function observe(element, deadline)
+  {
+    element.attr('animation-deadline', deadline);
+    observations.push(element);
+  }
+
+  function unobserve(element)
+  {
+    element.removeAttr('animation-deadline');
+  }
+
+  function callback(callbacks, thisArg, argsArray) 
+  {
+    if(!$.isArray(callbacks))
+      callbacks = [callbacks];
+    for(var i = 0;i < callbacks.length;++i)
+    {
+      if($.isFunction(callbacks[i]))
+        callbacks[i].apply(thisArg, argsArray);
+    }
+  };
+
+  function wrap(element, wrapper) 
+  {
+    if(element.css('display') == 'block')
+      wrapper.css('display', 'block');
+    else if(supportFlex)
+      wrapper.css('display', 'inline-flex');
+    else
+      wrapper.css('display', 'inline-block');
+    wrapper.attr('animation-wrapper', 1);
+    element.wrap(wrapper);
+    return element.parent();
+  }
+
+  function generateKeyframeCss(options) {
+    return generateKeyframeCssByPrefix('', options) + generateKeyframeCssByPrefix(vendorPrefix, options);
+  };
+
+  function generateKeyframeCssByPrefix(prefix, options) {
     var css = '@';
-    css += prefix + 'keyframes ' + this.name + '{';
+    css += prefix + 'keyframes ' + options.name + '{';
     for(var selector in options.keyframes)
     {
       var keyframe = options.keyframes[selector];
@@ -130,158 +338,36 @@
     return css;
   };
 
-  AnimationHandler.prototype.testRunning = function(e) {
-    if(this.success)
-      return;
-    (this.wrapper || this.element).trigger('animationfail');
-  };
-
-  AnimationHandler.prototype.animationStart = function(e) {
-    this.success = true;
-  };
-
-  AnimationHandler.prototype.animationEnd = function(e) {
-    this.success = true;
-    if(this.checkBatch())
-      this.finish();
-    if(e.type != 'animationfinish')
-      e.stopPropagation();
-  };
-
-  AnimationHandler.prototype.animationCancel = function() {
-    this.success = false;
-    if(this.checkBatch())
-      this.finish();
-    if(e.type == 'animationfail')
-      e.stopPropagation();
-  };
-
-  AnimationHandler.prototype.checkBatch = function() {
-    if(!batches[this.batchId])
-      return true;
-    var done = true;
-    var batch = batches[this.batchId];
-    for(var hid in batch)
-    {
-      if(hid == this.id)
-        continue;
-      var cb = batch[hid];
-      if(!cb)
-      {
-        done = false;
-        break;
-      }
-    }
-    if(done)
-    {
-      for(var hid in batch)
-      {
-        if(hid == this.id)
-          continue;
-        var cb = batch[hid]();
-      }
-      delete batches[this.batchId];
-      return true;
-    }
-    batch[this.id] = this.finish.bind(this);
-    return false;
-  };
-
-  AnimationHandler.prototype.finish = function() {
-    this.clear();
-    var options = this.options;
-    callback(this.success ? options.complete : options.fail, this.element[0], [options]);
-    callback(options.always, this.element[0], [this.options]);
-  };
-
-  AnimationHandler.prototype.clear = function() {
-    var element = this.wrapper || this.element;
-    element.removeAttr('animating');
-    element.removeAttr('batchId');
-    element.off(animationstart, this.animationStart);
-    element.off(animationend, this.animationEnd);
-    element.off('animationfinish', this.animationEnd);
-    element.off('animationcancel', this.animationCancel);
-    element.off('animationfail', this.animationCancel);
-    element.css('animation', '');
-    element.css(vendorPrefix + 'animation', '');
-    if(this.style)
-      this.style.remove();
-    if(this.wrapper)
-      this.wrapper.children().first().unwrap();
-  };
-
-  function callback(callbacks, thisArg, argsArray) 
+  function defineAnimation(name, keyframes)
   {
-    if(!$.isArray(callbacks))
-      callbacks = [callbacks];
-    for(var i = 0;i < callbacks.length;++i)
-    {
-      if($.isFunction(callbacks[i]))
-        callbacks[i].apply(thisArg, argsArray);
-    }
-  };
-
-  function wrap(element, wrapper) 
-  {
-    if(element.css('display') == 'block')
-      wrapper.css('display', 'block');
-    else if(supportFlex)
-      wrapper.css('display', 'inline-flex');
-    else
-      wrapper.css('display', 'inline-block');
+    var css = generateKeyframeCss({
+      name: name,
+      keyframes: keyframes
+    });
+    $('head').append($('<style></style>').append(css));
   }
 
-  function createHandler(elements, animation, options, customOptions)
+  function animate(animationIds, options)
   {
-    options = $.extend({}, options, customOptions);
-    options.duration = options.duration || animation.duration || 400;
-    options.direction = options.direction || animation.direction || 'normal';
-    options.easing = options.easing || animation.easing || 'ease';
-    options.delay = options.delay || animation.delay || 0;
-    options.repeat = options.repeat || animation.repeat || 1;
-    options.fillMode = options.fillMode || animation.fillMode || 'none';
-    options.start = [options.start, animation.start];
-    options.complete = [animation.complete, options.complete];
-    options.always = [animation.always, options.always];
-    options.fail = [animation.fail, options.fail];
-    options.animation = animation.name;
-    options.keyframes = animation.keyframes;
-    options.variables = {};
-    for(var variableName in animation.variables)
-      options.variables[variableName] = options[variableName] || animation.variables[variableName];
-    elements.each(function() {
-      var cloneOptions = $.extend({}, options);
-      new AnimationHandler(this, cloneOptions).animate();
-    });
+    var animations = [];
+    animationIds = animationIds.split(' ');
+    for(var i = 0;i < animationIds.length;++i)
+    {
+      var id = animationIds[i];
+      if(!id)
+        continue;
+      var animation = $.animations[id];
+      if(!animation)
+        animation = {name: id};
+      animation.id = id;
+      animations.push(animation);
+    }
+    new Action(this, animations, options).start();
   }
 
   $.animations = {};
-  $.animations.fn = {
-    wrap: wrap
-  };
-  
-  function animate(animationId, options)
-  {
-    options = $.extend({}, options);
-    var animationIds = animationId.split(' ');
-    options.overlay = options.overlay || animationIds.length > 1;
-    var custom = options.custom || {};
-    delete options.custom;
-    for(var i = 0;i < animationIds.length;++i)
-    {
-      var animationId = animationIds[i];
-      var animation = $.animations[animationId];
-      if(!animation)
-        animation = {name: animationId};
-      options.id = animationId;
-      createHandler(this, animation, options, custom[animationId] || {});
-      delete options.start;
-      delete options.complete;
-      delete options.always;
-      delete options.fail;
-    }
-  }
+  $.wrap = wrap;
+  $.defineAnimation = defineAnimation;
 
   var origAnimate = $.fn.animate;
   $.fn.animate = function(param1, param2) {
@@ -292,7 +378,7 @@
     }
     else if(typeof param1 == 'object' && (param1.name || param1.keyframes))
     {
-      createHandler(this, param1, {}, {});
+      new Action(this, [param1], {}).start();
       return;
     }
     return origAnimate.apply(this, arguments);
@@ -311,4 +397,6 @@
       this.trigger('animationfinish');
     return origFinish.apply(this, arguments);
   };
+
+  var timer = setInterval(checkFail, 100);
 })(jQuery, window, document);

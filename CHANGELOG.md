@@ -1,3 +1,10 @@
+# v0.2.0 / 2014-02-28
+
+* Rewrite for better structure and performance.
+* Fixed most issues when multiple animations interaction.
+* Automatically strip wrapper of plugins.
+* Add defineAnimations method for plugin.
+
 # v0.1.3 / 2014-02-24
 
 * Fixed options unexpected modification.
