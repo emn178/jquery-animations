@@ -1,3 +1,11 @@
+# v0.2.1 / 2014-03-01
+
+* Fixed stop and finish event bubble issue.
+* Change option name overlay to combinable.
+* Support custom callback options.
+* Fixed missing start callback.
+* Add fusion mode.
+
 # v0.2.0 / 2014-02-28
 
 * Rewrite for better structure and performance.

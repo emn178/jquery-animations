@@ -18,17 +18,19 @@ jQuery-animations currently supports IE10+, Chrome, Firefox, Safari and Opera.
 
 ## Usage
 ### Methods
-#### animate(name, [options])
+#### animate(id, [options])
 Perform CSS3 animations. This method extends from [jQuery.animate()](https://api.jquery.com/animate/), so the options naming follows its.
 
-##### *name: `String`*
+##### *id: `String`*
 
-Sets the animation name(s) you want to perform. It could be a mutiple animations by including each one separated by a space.
+Sets the animation ID(s) or name(s) you want to perform. It could be a mutiple animations by including each one separated by a space.
 
 Available animations please refer to [Effects](http://emn178.github.io/jquery-animations/samples/effects/).
 
+ID means that predined in JavaScript plugins, and name means that declares in CSS.
+
 ##### *options: `Object`*
-Sets the customized options.
+Sets the animations options.
 
 ###### *duration: `Number` (default: animation define or `400`)*
 Sets the number determining how long the animation will run(ms).
@@ -46,20 +48,35 @@ Sets the easing function to use for the transition.
 
 Available values please refer to [animation-timing-function](http://www.w3schools.com/cssref/css3_pr_animation-timing-function.asp)
 
-###### *overlay: `Boolean` (default: `false`)*
-Sets the flag determining the animation combines with previoud animation if exists. It will stop preivous animation when sets false.
-
-###### *complete: `Function(options)`*
-Sets the callback function to call once the animation is complete.
+###### *combinable: `Boolean` (default: `false`)*
+Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.
 
 ###### *start: `Function(options)`*
 Sets the callback function to call once the animation begins..
 
+###### *complete: `Function(options)`*
+Sets the callback function to call once the animation is complete. Notice, if there is any animation running inside target element, it won't trigger untill all done.
+
 ###### *fail: `Function(options)`*
-Sets the callback function to call when the animation fails to complete .
+Sets the callback function to call when the animation fails to complete. Notice, if there is any animation running inside target element, it won't trigger untill all done.
 
 ###### *always: `Function(options)`*
-Sets the callback function to call when the animation completes or stops without completing.
+Sets the callback function to call when the animation completes or stops without completing. Notice, if there is any animation running inside target element, it won't trigger untill all done.
+
+###### *custom: `Object`*
+Set customized options for each animation. Defines the same key as animation ID or name in this object. Customized options structure is the same with options of global.
+
+###### *animation defined options*
+There could be some plugin defined options, eg. `strength` option in `shake` animation.
+
+#### animate(animation)
+Perform CSS3 inlince animations. 
+
+##### *animation: `Object`*
+Extends options structure previously, but there must be a option `keyframes` in this object.
+
+###### *keyframes: `Object`*
+Specifies the keyframes of animation, just like css structure.
 
 #### finish()
 Stop CSS3 animations and trigger complete event. This method extends from [jQuery.finish()](https://api.jquery.com/finish/)
@@ -68,17 +85,11 @@ Stop CSS3 animations and trigger complete event. This method extends from [jQuer
 Stop CSS3 animations and trigger fail event. This method extends from [jQuery.stop()](https://api.jquery.com/stop/)
 
 ## Example
-
-HTML
-```HTML
-<div id="#want-to-animate">
-</div>
-```
-JavaScript
+Basic usage
 ```JavaScript
 $('#want-to-animate').animate('shake');
 ```
-You can also combine multiple animations
+You can also combine multiple animations once
 ```JavaScript
 $('#want-to-animate').animate('flyToUp flyToRight fadeOut', {
   complete: function(options) {
@@ -86,7 +97,74 @@ $('#want-to-animate').animate('flyToUp flyToRight fadeOut', {
   }
 });
 ```
+Or combine multiple animations in different time
+```JavaScript
+$('#want-to-animate').animate('shake', {combinable: true});
+$('#want-to-animate').animate('fadeOut', {combinable: true});
+```
+Inline animation
+```JavaScript
+$('#want-to-animate').animate({
+  keyframes: {
+    to: {
+      transform: 'rotate(360deg)'
+    }
+  }
+});
+```
+Sometimes you could combine mutiple animations frequent use to a new one.
+```JavaScript
+$.animations['hit'] = { fusion: 'fadeOut shake bounce' };
+// now you can call the new animation 'hit'
+$('#want-to-animate').animate('hit');
+```
+With options
+```JavaScript
+$('#want-to-animate').animate('animation1 animation2', {
+  // Sets the number determining how long the animation will run(ms).
+  duration: 400,
 
+  // Sets the number determining when the animation will start.(ms).
+  delay: 0,
+
+  // Sets the number determining the number of times an animation is played.
+  repeat: 1,
+
+  // Sets the easing function to use for the transition.
+  easing: 'ease',
+
+  // Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.
+  combinable: false,
+
+  // Sets the callback function to call once the animation begins..
+  start: function() { },
+
+  // Sets the callback function to call once the animation is complete.
+  complete: function() { },
+
+  // Sets the callback function to call when the animation fails to complete.
+  fail: function() { },
+
+  // Sets the callback function to call when the animation completes or stops without completing.
+  always: function() { },
+
+  // Set customized options for each animation. Defines the same key as animation ID or name in this object. Customized options structure is the same with options of global.
+  custom: {
+    animation1: {
+      // specify options for this animation...
+
+      duration: 1000
+
+      // ...
+    }
+  },
+
+  // There could be some plugin defined options.
+  var1: 'something'
+
+  // ...
+});
+```
 ## Developer Documentation
 Coming soon.
 
