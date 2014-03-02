@@ -111,6 +111,22 @@
 <p>Available values please refer to <a href="http://www.w3schools.com/cssref/css3_pr_animation-timing-function.asp">animation-timing-function</a></p>
 
 <h6>
+<a name="direction-string-default-animation-define-or-normal" class="anchor" href="#direction-string-default-animation-define-or-normal"><span class="octicon octicon-link"></span></a><em>direction: <code>String</code> (default: animation define or <code>"normal"</code>)</em>
+</h6>
+
+<p>Sets the property whether or not the animation should play in reverse on alternate cycles.</p>
+
+<p>Available values please refer to <a href="http://www.w3schools.com/cssref/css3_pr_animation-direction.asp">animation-direction</a></p>
+
+<h6>
+<a name="fillmode-string-default-animation-define-or-none" class="anchor" href="#fillmode-string-default-animation-define-or-none"><span class="octicon octicon-link"></span></a><em>fillMode: <code>String</code> (default: animation define or <code>"none"</code>)</em>
+</h6>
+
+<p>Sets the property specifies what styles will apply for the element when the animation is not playing. You can use <code>reset()</code> method to clear the state after <code>forwards</code> or <code>both</code>.</p>
+
+<p>Available values please refer to <a href="http://www.w3schools.com/cssref/css3_pr_animation-fill-mode.asp">animation-fill-mode</a></p>
+
+<h6>
 <a name="combinable-boolean-default-false" class="anchor" href="#combinable-boolean-default-false"><span class="octicon octicon-link"></span></a><em>combinable: <code>Boolean</code> (default: <code>false</code>)</em>
 </h6>
 
@@ -126,19 +142,25 @@
 <a name="complete-functionoptions" class="anchor" href="#complete-functionoptions"><span class="octicon octicon-link"></span></a><em>complete: <code>Function(options)</code></em>
 </h6>
 
-<p>Sets the callback function to call once the animation is complete. Notice, if there is any animation running inside target element, it won't trigger untill all done.</p>
+<p>Sets the callback function to call once the animation is complete.</p>
 
 <h6>
 <a name="fail-functionoptions" class="anchor" href="#fail-functionoptions"><span class="octicon octicon-link"></span></a><em>fail: <code>Function(options)</code></em>
 </h6>
 
-<p>Sets the callback function to call when the animation fails to complete. Notice, if there is any animation running inside target element, it won't trigger untill all done.</p>
+<p>Sets the callback function to call when the animation fails to complete.</p>
 
 <h6>
 <a name="always-functionoptions" class="anchor" href="#always-functionoptions"><span class="octicon octicon-link"></span></a><em>always: <code>Function(options)</code></em>
 </h6>
 
-<p>Sets the callback function to call when the animation completes or stops without completing. Notice, if there is any animation running inside target element, it won't trigger untill all done.</p>
+<p>Sets the callback function to call when the animation completes or stops without completing.</p>
+
+<h6>
+<a name="end-functionoptions" class="anchor" href="#end-functionoptions"><span class="octicon octicon-link"></span></a><em>end: <code>Function(options)</code></em>
+</h6>
+
+<p>Sets the callback function to call when the animation completes or stops without completing. But, if there is any animation running inside target element, it won't trigger untill all done.</p>
 
 <h6>
 <a name="custom-object" class="anchor" href="#custom-object"><span class="octicon octicon-link"></span></a><em>custom: <code>Object</code></em>
@@ -178,6 +200,11 @@
 <a name="stop" class="anchor" href="#stop"><span class="octicon octicon-link"></span></a>stop()</h4>
 
 <p>Stop CSS3 animations and trigger fail event. This method extends from <a href="https://api.jquery.com/stop/">jQuery.stop()</a></p>
+
+<h4>
+<a name="reset" class="anchor" href="#reset"><span class="octicon octicon-link"></span></a>reset()</h4>
+
+<p>Clear CSS3 keyframe stopped after <code>forwards</code> and <code>both</code>.</p>
 
 <h2>
 <a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
@@ -235,6 +262,12 @@
   <span class="c1">// Sets the easing function to use for the transition.</span>
   <span class="nx">easing</span><span class="o">:</span> <span class="s1">'ease'</span><span class="p">,</span>
 
+  <span class="c1">// Sets the property whether or not the animation should play in reverse on alternate cycles.</span>
+  <span class="nx">direction</span><span class="o">:</span> <span class="s1">'normal'</span><span class="p">,</span>
+
+  <span class="c1">// Sets the property specifies what styles will apply for the element when the animation is not playing.</span>
+  <span class="nx">fillMode</span><span class="o">:</span> <span class="s1">'none'</span><span class="p">,</span>
+
   <span class="c1">// Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.</span>
   <span class="nx">combinable</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
 
@@ -249,6 +282,9 @@
 
   <span class="c1">// Sets the callback function to call when the animation completes or stops without completing.</span>
   <span class="nx">always</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+
+  <span class="c1">// Sets the callback function to call when the animation completes or stops without completing. But, if there is any animation running inside target element, it won't trigger untill all done.</span>
+  <span class="nx">end</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
 
   <span class="c1">// Set customized options for each animation. Defines the same key as animation ID or name in this object. Customized options structure is the same with options of global.</span>
   <span class="nx">custom</span><span class="o">:</span> <span class="p">{</span>
