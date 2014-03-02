@@ -106,7 +106,7 @@
         continue;
       var checkbox = $('<input type="checkbox" class="animation-check"/>');
       checkbox.attr('id', key).attr('animation', key);
-      var label = $('<label class="animation input"></lable>');
+      var label = $('<label class="animation input highlight"></lable>');
       label.text(key).attr('for', key).click(click);
       $('#animations').append(checkbox).append(label);
       add(key);
@@ -114,5 +114,12 @@
 
     $('#submit').click(animate);
     $('body').on('change', 'input,select', update);
+
+    $('.animation').animate('flyIn', {
+      duration: 1500,
+      always: function() {
+        $(this).removeClass('highlight');
+      }
+    });
   });
 })(jQuery, window, document);

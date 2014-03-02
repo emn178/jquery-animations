@@ -70,7 +70,7 @@ h5 {
   color: rgb(190, 192, 195);
 }
 
-input:checked+.animation, .animation:hover {
+input:checked+.animation, .animation:hover, .highlight {
   background-color: rgb(230, 239, 248);
   color: rgb(113, 123, 137);
 }
@@ -162,7 +162,6 @@ select {
 .disable {
   display: none;
 }
-
 
 #showOptions {
   display: none;

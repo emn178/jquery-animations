@@ -12,12 +12,25 @@
     },
     start: function(options) {
       var element = $(this);
+      var w = element.outerWidth();
+      var h = element.outerHeight();
       var wrapper = $.wrap(element, $('<span></span>'));
-      wrapper.css('overflow', 'hidden');
-      var w = element.width();
-      var h = element.height();
-      wrapper.width(w);
-      wrapper.height(h);
+      wrapper.css({
+        'margin-left': element.css('margin-left'),
+        'margin-right': element.css('margin-right'),
+        'margin-top': element.css('margin-top'),
+        'margin-bottom': element.css('margin-bottom'),
+        'width': w + 'px',
+        'height': h + 'px',
+        'overflow': 'hidden'
+      });
+      options.margin = {
+        left: this.style.marginLeft,
+        right: this.style.marginRight,
+        top: this.style.marginTop,
+        bottom: this.style.marginBottom
+      };
+      element.css('margin', '0');
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
@@ -42,6 +55,12 @@
           options.variables.distance = distance || w;
           break;
       }
+    },
+    always: function(options) {
+      this.style.marginLeft = options.margin.left;
+      this.style.marginRight = options.margin.right;
+      this.style.marginTop = options.margin.top;
+      this.style.marginBottom = options.margin.bottom;
     }
   };
 

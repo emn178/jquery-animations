@@ -1,3 +1,9 @@
+# v0.2.2 / 2014-03-02
+
+* Fixed callback issue.
+* Fixed slide plugin issue of margin.
+* Add new method of fly plugin.
+
 # v0.2.1 / 2014-03-01
 
 * Fixed stop and finish event bubble issue.

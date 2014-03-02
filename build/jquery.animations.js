@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.2.0
+ * jQuery-animations v0.2.2
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -139,7 +139,7 @@
         this.actor = wrap(this.actor, $('<span></span>'));
       var options = $.extend({}, this.jobsOptions[i]);
 
-      callback(options.start, this.actor, [options])
+      callback(options.start, this.actor[0], [options])
       if(options.keyframes)
       {
         options.name = 'a' + ++id;
@@ -210,10 +210,10 @@
       return;
     this.clear();
     if(this.counter.complete > 0)
-      callback(this.options.complete, this.element, [this.options]);
+      callback(this.options.complete, this.element[0], [this.options]);
     if(this.counter.fail == this.counter.always)
-      callback(this.options.fail, this.element, [this.options]);
-    callback(this.options.always, this.element, [this.options]);
+      callback(this.options.fail, this.element[0], [this.options]);
+    callback(this.options.always, this.element[0], [this.options]);
   };
 
   Task.prototype.oncancel = function(e) {
@@ -363,6 +363,8 @@
     {
       if($.isFunction(callbacks[i]))
         callbacks[i].apply(thisArg, argsArray);
+      else if($.isArray(callbacks[i]))
+        callback(callbacks[i], thisArg, argsArray);
     }
   };
 
@@ -510,34 +512,11 @@
   $.animations['fadeOut'] = $.extend({
     direction: 'reverse'
   }, animation);
-
-  $.animations['hit'] = {
-    fusion: 'fadeOut shake bounce',
-    custom: {
-      fadeOut: {
-        repeat: 2,
-        duration: 250
-      }
-    }
-  };
-
-  $.animations['hitDie'] = {
-    fusion: 'fadeOut hit',
-    custom: {
-      fadeOut: {
-        duration: 1000,
-        delay: 1200
-      }
-    },
-    always: function() {
-      $(this).remove();
-    }
-  };
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   var keyframes = {
-    from: { transform: 'translate${axis}(${distance}px)' },
-    to: { transform: 'translate${axis}(0)' }
+    from: { transform: 'translate(${x}px,${y}px)' },
+    to: { transform: 'translate(0)' }
   };
 
   var animation = {
@@ -551,33 +530,39 @@
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
         distance = variables.distance;
+      if(options.id == 'flyIn' || options.id == 'flyOut')
+      {
+        distance = distance || Math.max($(document).height(), $(document).width());
+        variables.x = parseInt(Math.random() * 2 * distance - distance);
+        variables.y = (distance - Math.abs(variables.x)) * (Math.random() > 0.5 ? 1 : -1);
+        return;
+      }
+
       var direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
+      variables.x = 0;
+      variables.y = 0;
       switch(direction)
       {
         case 'up':
-          variables.axis = 'Y';
-          variables.distance = distance || -$(document).height();
+          variables.y = distance || -$(document).height();
           break;
         case 'down':
-          variables.axis = 'Y';
-          variables.distance = distance || $(document).height();
+          variables.y = distance || $(document).height();
           break;
         case 'left':
-          variables.axis = 'X';
-          variables.distance = distance || -$(document).width();
+          variables.x = distance || -$(document).width();
           break;
         case 'right':
-          variables.axis = 'X';
-          variables.distance = distance || $(document).width();
+          variables.x = distance || $(document).width();
           break;
       }
     }
   };
 
   ['flyFromUp', 'flyFromDown', 'flyFromRight', 'flyFromLeft', 
-   'flyToUp', 'flyToDown', 'flyToRight', 'flyToLeft'].forEach(function(name) {
+   'flyToUp', 'flyToDown', 'flyToRight', 'flyToLeft', 'flyIn', 'flyOut'].forEach(function(name) {
     $.animations[name] = $.extend({}, animation);
-    if(name.indexOf('To') != -1)
+    if(name.indexOf('To') != -1 || name == 'flyOut')
       $.animations[name].direction = 'reverse';
   });
 })(jQuery, window, document);
@@ -617,12 +602,25 @@
     },
     start: function(options) {
       var element = $(this);
+      var w = element.outerWidth();
+      var h = element.outerHeight();
       var wrapper = $.wrap(element, $('<span></span>'));
-      wrapper.css('overflow', 'hidden');
-      var w = element.width();
-      var h = element.height();
-      wrapper.width(w);
-      wrapper.height(h);
+      wrapper.css({
+        'margin-left': element.css('margin-left'),
+        'margin-right': element.css('margin-right'),
+        'margin-top': element.css('margin-top'),
+        'margin-bottom': element.css('margin-bottom'),
+        'width': w + 'px',
+        'height': h + 'px',
+        'overflow': 'hidden'
+      });
+      options.margin = {
+        left: this.style.marginLeft,
+        right: this.style.marginRight,
+        top: this.style.marginTop,
+        bottom: this.style.marginBottom
+      };
+      element.css('margin', '0');
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
@@ -647,6 +645,12 @@
           options.variables.distance = distance || w;
           break;
       }
+    },
+    always: function(options) {
+      this.style.marginLeft = options.margin.left;
+      this.style.marginRight = options.margin.right;
+      this.style.marginTop = options.margin.top;
+      this.style.marginBottom = options.margin.bottom;
     }
   };
 
