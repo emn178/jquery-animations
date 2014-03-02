@@ -36,7 +36,7 @@
 
 <p>A CSS3 animation framework based on jQuery providing an easy way to develop cross browser CSS3 animations.</p>
 
-<p>For the user, it could be easy to use jQuery method to call and use the animations predefined.</p>
+<p>For the user, it could be easy to use jQuery method to perform and combine the animations.</p>
 
 <p>For the developer, it could be easy to develop cross browser CSS3 animations by using JavaScript.</p>
 
@@ -62,23 +62,25 @@
 <a name="methods" class="anchor" href="#methods"><span class="octicon octicon-link"></span></a>Methods</h3>
 
 <h4>
-<a name="animatename-options" class="anchor" href="#animatename-options"><span class="octicon octicon-link"></span></a>animate(name, [options])</h4>
+<a name="animateid-options" class="anchor" href="#animateid-options"><span class="octicon octicon-link"></span></a>animate(id, [options])</h4>
 
-<p>Perform CSS3 animations. This method extends from <a href="https://api.jquery.com/animate/">jQuery.animate()</a>, so the options naming follows the its.</p>
+<p>Perform CSS3 animations. This method extends from <a href="https://api.jquery.com/animate/">jQuery.animate()</a>, so the options naming follows its.</p>
 
 <h5>
-<a name="name-string" class="anchor" href="#name-string"><span class="octicon octicon-link"></span></a><em>name: <code>String</code></em>
+<a name="id-string" class="anchor" href="#id-string"><span class="octicon octicon-link"></span></a><em>id: <code>String</code></em>
 </h5>
 
-<p>Sets the animation name(s) you want to perform. It could be a mutiple animations by including each one separated by a space.</p>
+<p>Sets the animation ID(s) or name(s) you want to perform. It could be a mutiple animations by including each one separated by a space.</p>
 
 <p>Available animations please refer to <a href="http://emn178.github.io/jquery-animations/samples/effects/">Effects</a>.</p>
+
+<p>ID means that predined in JavaScript plugins, and name means that declares in CSS.</p>
 
 <h5>
 <a name="options-object" class="anchor" href="#options-object"><span class="octicon octicon-link"></span></a><em>options: <code>Object</code></em>
 </h5>
 
-<p>Sets the customized options.</p>
+<p>Sets the animations options.</p>
 
 <h6>
 <a name="duration-number-default-animation-define-or-400" class="anchor" href="#duration-number-default-animation-define-or-400"><span class="octicon octicon-link"></span></a><em>duration: <code>Number</code> (default: animation define or <code>400</code>)</em>
@@ -109,16 +111,10 @@
 <p>Available values please refer to <a href="http://www.w3schools.com/cssref/css3_pr_animation-timing-function.asp">animation-timing-function</a></p>
 
 <h6>
-<a name="overlay-boolean-default-false" class="anchor" href="#overlay-boolean-default-false"><span class="octicon octicon-link"></span></a><em>overlay: <code>Boolean</code> (default: <code>false</code>)</em>
+<a name="combinable-boolean-default-false" class="anchor" href="#combinable-boolean-default-false"><span class="octicon octicon-link"></span></a><em>combinable: <code>Boolean</code> (default: <code>false</code>)</em>
 </h6>
 
-<p>Sets the flag determining the animation combines with previoud animation if exists. It will stop preivous animation when sets false.</p>
-
-<h6>
-<a name="complete-functionoptions" class="anchor" href="#complete-functionoptions"><span class="octicon octicon-link"></span></a><em>complete: <code>Function(options)</code></em>
-</h6>
-
-<p>Sets the callback function to call once the animation is complete.</p>
+<p>Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.</p>
 
 <h6>
 <a name="start-functionoptions" class="anchor" href="#start-functionoptions"><span class="octicon octicon-link"></span></a><em>start: <code>Function(options)</code></em>
@@ -127,16 +123,51 @@
 <p>Sets the callback function to call once the animation begins..</p>
 
 <h6>
+<a name="complete-functionoptions" class="anchor" href="#complete-functionoptions"><span class="octicon octicon-link"></span></a><em>complete: <code>Function(options)</code></em>
+</h6>
+
+<p>Sets the callback function to call once the animation is complete. Notice, if there is any animation running inside target element, it won't trigger untill all done.</p>
+
+<h6>
 <a name="fail-functionoptions" class="anchor" href="#fail-functionoptions"><span class="octicon octicon-link"></span></a><em>fail: <code>Function(options)</code></em>
 </h6>
 
-<p>Sets the callback function to call when the animation fails to complete .</p>
+<p>Sets the callback function to call when the animation fails to complete. Notice, if there is any animation running inside target element, it won't trigger untill all done.</p>
 
 <h6>
 <a name="always-functionoptions" class="anchor" href="#always-functionoptions"><span class="octicon octicon-link"></span></a><em>always: <code>Function(options)</code></em>
 </h6>
 
-<p>Sets the callback function to call when the animation completes or stops without completing.</p>
+<p>Sets the callback function to call when the animation completes or stops without completing. Notice, if there is any animation running inside target element, it won't trigger untill all done.</p>
+
+<h6>
+<a name="custom-object" class="anchor" href="#custom-object"><span class="octicon octicon-link"></span></a><em>custom: <code>Object</code></em>
+</h6>
+
+<p>Set customized options for each animation. Defines the same key as animation ID or name in this object. Customized options structure is the same with options of global.</p>
+
+<h6>
+<a name="animation-defined-options" class="anchor" href="#animation-defined-options"><span class="octicon octicon-link"></span></a><em>animation defined options</em>
+</h6>
+
+<p>There could be some plugin defined options, eg. <code>strength</code> option in <code>shake</code> animation.</p>
+
+<h4>
+<a name="animateanimation" class="anchor" href="#animateanimation"><span class="octicon octicon-link"></span></a>animate(animation)</h4>
+
+<p>Perform CSS3 inlince animations. </p>
+
+<h5>
+<a name="animation-object" class="anchor" href="#animation-object"><span class="octicon octicon-link"></span></a><em>animation: <code>Object</code></em>
+</h5>
+
+<p>Extends options structure previously, but there must be a option <code>keyframes</code> in this object.</p>
+
+<h6>
+<a name="keyframes-object" class="anchor" href="#keyframes-object"><span class="octicon octicon-link"></span></a><em>keyframes: <code>Object</code></em>
+</h6>
+
+<p>Specifies the keyframes of animation, just like css structure.</p>
 
 <h4>
 <a name="finish" class="anchor" href="#finish"><span class="octicon octicon-link"></span></a>finish()</h4>
@@ -151,23 +182,89 @@
 <h2>
 <a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
 
-<p>HTML</p>
-
-<div class="highlight highlight-HTML"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"#want-to-animate"</span><span class="nt">&gt;</span>
-<span class="nt">&lt;/div&gt;</span>
-</pre></div>
-
-<p>JavaScript</p>
+<p>Basic usage</p>
 
 <div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">(</span><span class="s1">'shake'</span><span class="p">);</span>
 </pre></div>
 
-<p>You can also combine multiple animations</p>
+<p>You can also combine multiple animations once</p>
 
 <div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">(</span><span class="s1">'flyToUp flyToRight fadeOut'</span><span class="p">,</span> <span class="p">{</span>
   <span class="nx">complete</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>
   <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Or combine multiple animations in different time</p>
+
+<div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">(</span><span class="s1">'shake'</span><span class="p">,</span> <span class="p">{</span><span class="nx">combinable</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+<span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">(</span><span class="s1">'fadeOut'</span><span class="p">,</span> <span class="p">{</span><span class="nx">combinable</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+</pre></div>
+
+<p>Inline animation</p>
+
+<div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">({</span>
+  <span class="nx">keyframes</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">to</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">transform</span><span class="o">:</span> <span class="s1">'rotate(360deg)'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Sometimes you could combine mutiple animations frequent use to a new one.</p>
+
+<div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">.</span><span class="nx">animations</span><span class="p">[</span><span class="s1">'hit'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">fusion</span><span class="o">:</span> <span class="s1">'fadeOut shake bounce'</span> <span class="p">};</span>
+<span class="c1">// now you can call the new animation 'hit'</span>
+<span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">(</span><span class="s1">'hit'</span><span class="p">);</span>
+</pre></div>
+
+<p>With options</p>
+
+<div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">(</span><span class="s1">'animation1 animation2'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="c1">// Sets the number determining how long the animation will run(ms).</span>
+  <span class="nx">duration</span><span class="o">:</span> <span class="mi">400</span><span class="p">,</span>
+
+  <span class="c1">// Sets the number determining when the animation will start.(ms).</span>
+  <span class="nx">delay</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+
+  <span class="c1">// Sets the number determining the number of times an animation is played.</span>
+  <span class="nx">repeat</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+
+  <span class="c1">// Sets the easing function to use for the transition.</span>
+  <span class="nx">easing</span><span class="o">:</span> <span class="s1">'ease'</span><span class="p">,</span>
+
+  <span class="c1">// Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.</span>
+  <span class="nx">combinable</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+
+  <span class="c1">// Sets the callback function to call once the animation begins..</span>
+  <span class="nx">start</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+
+  <span class="c1">// Sets the callback function to call once the animation is complete.</span>
+  <span class="nx">complete</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+
+  <span class="c1">// Sets the callback function to call when the animation fails to complete.</span>
+  <span class="nx">fail</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+
+  <span class="c1">// Sets the callback function to call when the animation completes or stops without completing.</span>
+  <span class="nx">always</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+
+  <span class="c1">// Set customized options for each animation. Defines the same key as animation ID or name in this object. Customized options structure is the same with options of global.</span>
+  <span class="nx">custom</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">animation1</span><span class="o">:</span> <span class="p">{</span>
+      <span class="c1">// specify options for this animation...</span>
+
+      <span class="nx">duration</span><span class="o">:</span> <span class="mi">1000</span>
+
+      <span class="c1">// ...</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="c1">// There could be some plugin defined options.</span>
+  <span class="nx">var1</span><span class="o">:</span> <span class="s1">'something'</span>
+
+  <span class="c1">// ...</span>
 <span class="p">});</span>
 </pre></div>
 
