@@ -14,7 +14,7 @@
       var element = $(this);
       var w = element.outerWidth();
       var h = element.outerHeight();
-      var wrapper = $.wrap(element, $('<span></span>'));
+      var wrapper = $.wrap(element);
       wrapper.css({
         'margin-left': element.css('margin-left'),
         'margin-right': element.css('margin-right'),
@@ -56,7 +56,7 @@
           break;
       }
     },
-    always: function(options) {
+    end: function(options) {
       this.style.marginLeft = options.margin.left;
       this.style.marginRight = options.margin.right;
       this.style.marginTop = options.margin.top;
