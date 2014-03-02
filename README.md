@@ -48,6 +48,16 @@ Sets the easing function to use for the transition.
 
 Available values please refer to [animation-timing-function](http://www.w3schools.com/cssref/css3_pr_animation-timing-function.asp)
 
+###### *direction: `String` (default: animation define or `"normal"`)*
+Sets the property whether or not the animation should play in reverse on alternate cycles.
+
+Available values please refer to [animation-direction](http://www.w3schools.com/cssref/css3_pr_animation-direction.asp)
+
+###### *fillMode: `String` (default: animation define or `"none"`)*
+Sets the property specifies what styles will apply for the element when the animation is not playing. You can use `reset()` method to clear the state after `forwards` or `both`.
+
+Available values please refer to [animation-fill-mode](http://www.w3schools.com/cssref/css3_pr_animation-fill-mode.asp)
+
 ###### *combinable: `Boolean` (default: `false`)*
 Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.
 
@@ -55,13 +65,16 @@ Sets the flag determining the animation combines with other animations. It will 
 Sets the callback function to call once the animation begins..
 
 ###### *complete: `Function(options)`*
-Sets the callback function to call once the animation is complete. Notice, if there is any animation running inside target element, it won't trigger untill all done.
+Sets the callback function to call once the animation is complete.
 
 ###### *fail: `Function(options)`*
-Sets the callback function to call when the animation fails to complete. Notice, if there is any animation running inside target element, it won't trigger untill all done.
+Sets the callback function to call when the animation fails to complete.
 
 ###### *always: `Function(options)`*
-Sets the callback function to call when the animation completes or stops without completing. Notice, if there is any animation running inside target element, it won't trigger untill all done.
+Sets the callback function to call when the animation completes or stops without completing.
+
+###### *end: `Function(options)`*
+Sets the callback function to call when the animation completes or stops without completing. But, if there is any animation running inside target element, it won't trigger untill all done.
 
 ###### *custom: `Object`*
 Set customized options for each animation. Defines the same key as animation ID or name in this object. Customized options structure is the same with options of global.
@@ -83,6 +96,9 @@ Stop CSS3 animations and trigger complete event. This method extends from [jQuer
 
 #### stop()
 Stop CSS3 animations and trigger fail event. This method extends from [jQuery.stop()](https://api.jquery.com/stop/)
+
+#### reset()
+Clear CSS3 keyframe stopped after `forwards` and `both`.
 
 ## Example
 Basic usage
@@ -133,6 +149,12 @@ $('#want-to-animate').animate('animation1 animation2', {
   // Sets the easing function to use for the transition.
   easing: 'ease',
 
+  // Sets the property whether or not the animation should play in reverse on alternate cycles.
+  direction: 'normal',
+
+  // Sets the property specifies what styles will apply for the element when the animation is not playing.
+  fillMode: 'none',
+
   // Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.
   combinable: false,
 
@@ -147,6 +169,9 @@ $('#want-to-animate').animate('animation1 animation2', {
 
   // Sets the callback function to call when the animation completes or stops without completing.
   always: function() { },
+
+  // Sets the callback function to call when the animation completes or stops without completing. But, if there is any animation running inside target element, it won't trigger untill all done.
+  end: function() { },
 
   // Set customized options for each animation. Defines the same key as animation ID or name in this object. Customized options structure is the same with options of global.
   custom: {

@@ -1,3 +1,9 @@
+# v0.2.3 / 2014-03-02
+
+* Support animation fille mode.
+* Support animation direction.
+* Add end callback.
+
 # v0.2.2 / 2014-03-02
 
 * Fixed callback issue.
