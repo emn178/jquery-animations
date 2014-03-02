@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.2.1
+ * jQuery-animations v0.2.2
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -139,7 +139,7 @@
         this.actor = wrap(this.actor, $('<span></span>'));
       var options = $.extend({}, this.jobsOptions[i]);
 
-      callback(options.start, this.actor, [options])
+      callback(options.start, this.actor[0], [options])
       if(options.keyframes)
       {
         options.name = 'a' + ++id;
@@ -210,10 +210,10 @@
       return;
     this.clear();
     if(this.counter.complete > 0)
-      callback(this.options.complete, this.element, [this.options]);
+      callback(this.options.complete, this.element[0], [this.options]);
     if(this.counter.fail == this.counter.always)
-      callback(this.options.fail, this.element, [this.options]);
-    callback(this.options.always, this.element, [this.options]);
+      callback(this.options.fail, this.element[0], [this.options]);
+    callback(this.options.always, this.element[0], [this.options]);
   };
 
   Task.prototype.oncancel = function(e) {
@@ -363,6 +363,8 @@
     {
       if($.isFunction(callbacks[i]))
         callbacks[i].apply(thisArg, argsArray);
+      else if($.isArray(callbacks[i]))
+        callback(callbacks[i], thisArg, argsArray);
     }
   };
 
