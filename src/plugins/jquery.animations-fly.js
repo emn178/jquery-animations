@@ -29,13 +29,13 @@
       switch(direction)
       {
         case 'up':
-          variables.y = distance || -$(document).height();
+          variables.y = -distance || -$(document).height();
           break;
         case 'down':
           variables.y = distance || $(document).height();
           break;
         case 'left':
-          variables.x = distance || -$(document).width();
+          variables.x = -distance || -$(document).width();
           break;
         case 'right':
           variables.x = distance || $(document).width();
