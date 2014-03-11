@@ -615,13 +615,13 @@
       switch(direction)
       {
         case 'up':
-          variables.y = distance || -$(document).height();
+          variables.y = -distance || -$(document).height();
           break;
         case 'down':
           variables.y = distance || $(document).height();
           break;
         case 'left':
-          variables.x = distance || -$(document).width();
+          variables.x = -distance || -$(document).width();
           break;
         case 'right':
           variables.x = distance || $(document).width();
@@ -701,7 +701,7 @@
       {
         case 'up':
           variables.axis = 'Y';
-          options.variables.distance = distance || -h;
+          options.variables.distance = -distance || -h;
           break;
         case 'down':
           variables.axis = 'Y';
@@ -709,7 +709,7 @@
           break;
         case 'left':
           variables.axis = 'X';
-          options.variables.distance = distance || -w;
+          options.variables.distance = -distance || -w;
           break;
         case 'right':
           variables.axis = 'X';

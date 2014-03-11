@@ -40,7 +40,7 @@
       {
         case 'up':
           variables.axis = 'Y';
-          options.variables.distance = distance || -h;
+          options.variables.distance = -distance || -h;
           break;
         case 'down':
           variables.axis = 'Y';
@@ -48,7 +48,7 @@
           break;
         case 'left':
           variables.axis = 'X';
-          options.variables.distance = distance || -w;
+          options.variables.distance = -distance || -w;
           break;
         case 'right':
           variables.axis = 'X';
