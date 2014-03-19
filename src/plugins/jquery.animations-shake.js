@@ -11,7 +11,7 @@
     variables: {
       strength: 10
     },
-    start: function(options) {
+    prepare: function(options) {
       var strength = options.variables.strength;
       if(!$.isNumeric(options.variables.strength))
         strength = 10;

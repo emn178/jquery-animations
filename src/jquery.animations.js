@@ -37,10 +37,12 @@
     {
       if(this.fusions.length > 0)
       {
+        this.fusions[0].prepare =  [this.taskOptions.prepare, this.fusions[0].prepare];
         this.fusions[0].start =  [this.taskOptions.start, this.fusions[0].start];
         this.fusions[0].complete =  [this.taskOptions.complete, this.fusions[0].complete];
         this.fusions[0].always =  [this.taskOptions.always, this.fusions[0].always];
         this.fusions[0].fail =  [this.taskOptions.fail, this.fusions[0].fail];
+        this.fusions[0].end =  [this.taskOptions.end, this.fusions[0].end];
       }
     }
     else
@@ -55,6 +57,7 @@
 
   Action.prototype.prepare = function() {
     this.taskOptions = $.extend({}, this.options);
+    delete this.taskOptions.prepare;
     delete this.taskOptions.start;
     delete this.taskOptions.complete;
     delete this.taskOptions.always;
@@ -86,6 +89,7 @@
       options.repeat = options.repeat || animation.repeat || 1;
       options.fillMode = options.fillMode || animation.fillMode || 'none';
       options.timeout = options.timeout || 500;
+      options.prepare = [options.prepare, animation.prepare];
       options.start = [options.start, animation.start];
       options.complete = [animation.complete, options.complete];
       options.always = [animation.always, options.always];
@@ -99,6 +103,7 @@
 
       this.jobsOptions.push(options);
     } 
+    this.taskOptions.prepare = this.options.prepare;
     this.taskOptions.start = this.options.start;
     this.taskOptions.complete = this.options.complete;
     this.taskOptions.always = this.options.always;
@@ -110,8 +115,11 @@
   {
     this.element = $(element);
     this.options = options;
+    this.options.element = this.element;
+    this.options.originalElement = this.element;
     this.jobsOptions = jobsOptions;
     this.reset = true;
+    this.started = false;
     this.counter = {
       complete: 0,
       fail: 0,
@@ -128,12 +136,13 @@
     ++tasks;
     this.element.attr('animation-tasks', tasks);
     this.ontasksend = this.ontasksend.bind(this);
+    this.onstart = this.onstart.bind(this);
     this.oncancel = this.oncancel.bind(this);
     this.onfinish = this.onfinish.bind(this);
     this.element.on('tasksend', this.ontasksend);
     this.element.on('animationcancel', this.oncancel);
     this.element.on('animationfinish', this.onfinish);
-    callback(this.options.start, this.element, [this.options]);
+    callback(this.options.prepare, this.element[0], [this.options]);
 
     this.actor = this.element;
     var css = '';
@@ -146,7 +155,7 @@
       if(options.fillMode == 'forwards' || options.fillMode == 'both')
         this.reset = false;
 
-      callback(options.start, this.actor[0], [options])
+      callback(options.prepare, this.actor[0], [options])
       if(options.keyframes)
       {
         options.name = 'a' + ++id;
@@ -157,9 +166,12 @@
         });
       }
 
+      options.start = [options.start, this.onstart.bind(this)];
       options.complete = [options.complete, this.oncomplete.bind(this)];
       options.fail = [options.fail, this.onfail.bind(this)];
       options.always = [options.always, this.onalways.bind(this)];
+      options.originalElement = this.element;
+      options.element = this.actor;
       this.jobs.push(new Job(this.actor, options));
     }
 
@@ -192,6 +204,13 @@
       return;
     this.element.trigger('animationcancel');
     this.element.attr('animation-combinable', 1);
+  };
+
+  Task.prototype.onstart = function() {
+    if(this.started)
+      return;
+    this.started = true;
+    callback(this.options.start, this.element[0], [this.options]);
   };
 
   Task.prototype.oncomplete = function() {
@@ -326,6 +345,7 @@
 
   Job.prototype.onstart = function(e) {
     unobserve(this.element);
+    callback(this.options.start, this.element[0], [this.options]);
   };
 
   Job.prototype.onfail = function(e) {

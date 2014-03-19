@@ -10,7 +10,7 @@
     variables: {
       distance: null
     },
-    start: function(options) {
+    prepare: function(options) {
       var element = $(this);
       var w = element.outerWidth();
       var h = element.outerHeight();
