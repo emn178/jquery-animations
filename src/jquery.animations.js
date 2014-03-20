@@ -57,6 +57,7 @@
 
   Action.prototype.prepare = function() {
     this.taskOptions = $.extend({}, this.options);
+    delete this.taskOptions.bundle;
     delete this.taskOptions.prepare;
     delete this.taskOptions.start;
     delete this.taskOptions.complete;
@@ -97,9 +98,14 @@
       options.fail = [animation.fail, options.fail];
       options.name = animation.name;
       options.keyframes = animation.keyframes;
+      options.bundle = animation.bundle || options.bundle;
       options.variables = {};
       for(var variableName in animation.variables)
-        options.variables[variableName] = options[variableName] || animation.variables[variableName];
+      {
+        options.variables[variableName] = options[variableName];
+        if(options[variableName] === undefined)
+          options.variables[variableName] = animation.variables[variableName];
+      }
 
       this.jobsOptions.push(options);
     } 
@@ -149,13 +155,13 @@
     this.jobs = [];
     for(var i = 0;i < this.jobsOptions.length;++i)
     {
+      var options = $.extend({}, this.jobsOptions[i]);
       if(this.options.combinable || i > 0)
         this.actor = wrap(this.actor);
-      var options = $.extend({}, this.jobsOptions[i]);
       if(options.fillMode == 'forwards' || options.fillMode == 'both')
         this.reset = false;
 
-      callback(options.prepare, this.actor[0], [options])
+      callback(options.prepare, this.actor[0], [options]);
       if(options.keyframes)
       {
         options.name = 'a' + ++id;
@@ -287,8 +293,7 @@
   };
 
   Task.prototype.clear = function() {
-    this.element.css('animation', '');
-    this.element.css(vendorPrefix + 'animation', '');
+    this.element.vendorCss('animation', '');
     if(this.style)
       this.style.remove();
     if(!this.cleaner)
@@ -327,8 +332,7 @@
       options.fillMode
       // 'forwards'
     ].join(' ');
-    element.css('animation', properties);
-    element.css(vendorPrefix + 'animation', properties);
+    element.vendorCss('animation', properties);
 
     this.onstart = this.onstart.bind(this);
     this.onend = this.onend.bind(this);
@@ -456,15 +460,37 @@
   function wrap(element) 
   {
     var wrapper = $('<span></span>');
-    if(element.css('display') == 'block')
+    var display = element.attr('display') || element.css('display');
+    if(display == 'block')
       wrapper.css('display', 'block');
     else if(supportFlex)
       wrapper.css('display', 'inline-flex');
     else
       wrapper.css('display', 'inline-block');
     wrapper.attr('animation-wrapper', 1);
+    if(element.css('float') != 'none')
+    {
+      wrapper.height(element.height());
+      wrapper.width(element.width());
+      wrapper.css('float', element.css('float'));
+    }
     element.wrap(wrapper);
+    element.attr('display', display);
     return element.parent();
+  }
+
+  function saveStyle(element, properties)
+  {
+    var style = {};
+    for(var i = 0;i < properties.length;++i)
+      style[properties[i]] = element.style[properties[i]];
+    return style;
+  }
+
+  function restoreStyle(element, style)
+  {
+    for(var propertyName in style)
+      element.style[propertyName] = style[propertyName];
   }
 
   function generateKeyframeCss(options) {
@@ -528,6 +554,8 @@
   $.animations = {};
   $.wrap = wrap;
   $.defineAnimation = defineAnimation;
+  $.saveStyle = saveStyle;
+  $.restoreStyle = restoreStyle;
 
   var origAnimate = $.fn.animate;
   $.fn.animate = function(param1, param2) {
@@ -563,5 +591,14 @@
       return this.trigger('animationreset');
   };
 
+  $.fn.vendorCss = function(propertyName, value) {
+    this.css(propertyName, value);
+    this.css(vendorPrefix + propertyName, value);
+  };
+
   var timer = setInterval(checkFail, 100);
+  $.defineAnimation('empty', {
+    from: {  },
+    to: {  }
+  });
 })(jQuery, window, document);

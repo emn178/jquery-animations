@@ -61,6 +61,9 @@ Available values please refer to [animation-fill-mode](http://www.w3schools.com/
 ###### *combinable: `Boolean` (default: `false`)*
 Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.
 
+###### *prepare: `Function(options)`*
+Sets the callback function to call once animations are ready to begin.
+
 ###### *start: `Function(options)`*
 Sets the callback function to call once the animation begins..
 
@@ -157,6 +160,9 @@ $('#want-to-animate').animate('animation1 animation2', {
 
   // Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.
   combinable: false,
+
+  // Sets the callback function to call once animations are ready to begin.
+  prepare: function() { },
 
   // Sets the callback function to call once the animation begins..
   start: function() { },

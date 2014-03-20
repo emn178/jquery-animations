@@ -1,6 +1,6 @@
 {
   "name": "jQuery-animations",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "A CSS3 animation framework based on jQuery providing an easy way to develop cross browser CSS3 animations.",
   "main": "src/jquery-animations.js",
   "repository": {

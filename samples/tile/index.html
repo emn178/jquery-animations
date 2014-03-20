@@ -17,13 +17,13 @@
 </head>
 <body>
   <div id="header">
-    <h1>Effects</h1>
+    <h1>Tile</h1>
     <a href="https://github.com/emn178/jquery-animations"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://github-camo.global.ssl.fastly.net/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
   </div>
   <div id="body">
     <div id="description">
       <p>
-        List predefined animations. Click button to see the effect and source code.
+        This page shows tile plugin usage. Click button to see the effect and source code.
       </p>
     </div>
     <div id="container">
@@ -32,10 +32,19 @@
     <div id="settings">
       <button id="submit">Animate</button>
       <div id="animations">
-        <h3>Animations</h3>
-        <div>
-          <input id="combine" type="checkbox" checked="checked"/>
-          <label for="combine">Combine</label>
+        <div id="effect">
+          <h3>Effect</h3>
+          <div>
+            <input id="combine" type="checkbox" checked="checked"/>
+            <label for="combine">Combine</label>
+          </div>
+        </div>
+        <div id="alternate">
+          <h3>Alternate</h3>
+          <div>
+            <input id="combine" type="checkbox" checked="checked"/>
+            <label for="combine">Combine</label>
+          </div>
         </div>
       </div>
       <input id="showOptions" name="showOptions" type="checkbox"/>
@@ -59,17 +68,27 @@
               <option value="ease-out">Ease Out</option>
               <option value="ease-in-out">Ease In Out</option>
             </select>
-            <label for="strength" class="custom">*Strength</label>
-            <input type="number" id="strength" name="strength" step="1" min="0" />
-            <label for="distance" class="custom">*Distance</label>
-            <input type="number" id="distance" name="distance" step="1" min="0" />
+            <label for="rows" class="custom">Rows</label>
+            <input type="number" id="rows" name="rows" step="1" min="0" />
+            <label for="cols" class="custom">Cols</label>
+            <input type="number" id="cols" name="cols" step="1" min="0" />
+            <input id="ordering" name="ordering" type="checkbox" value="true" checked="checked"/>
+            <label for="ordering" class="custom">Ordering</label>
+            <label for="order" class="custom">Order</label>
+            <select id="order" name="order">
+              <option value="">Default</option>
+              <option value="lrtb">Left-Right Top-Bottom</option>
+              <option value="lrbt">Left-Right Bottom-Top</option>
+              <option value="rltb">Right-Left Top-Bottom</option>
+              <option value="rlbt">Right-Left Bottom-Top</option>
+            </select>
           </div>
         </div>
       </div>
     </div>
     <div id="code-block">
       <h3>Source Code</h3>
-      <pre id="code">&nbsp;</pre>
+      <pre id="code">$('#image').animate('tile');</pre>
     </div>
   </div>
   <div id="footer">
