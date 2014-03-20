@@ -11,6 +11,7 @@ For the developer, it could be easy to develop cross browser CSS3 animations by 
 
 ## Demo
 [Effects](http://emn178.github.io/jquery-animations/samples/effects/)  
+[Tile](http://emn178.github.io/jquery-animations/samples/tile/)  
 [Integrate with CSS Library](http://jsfiddle.net/emn178/vN8V8/)
 
 ## Browser Support

@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.2.3
+ * jQuery-animations v0.3.0
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -37,10 +37,12 @@
     {
       if(this.fusions.length > 0)
       {
+        this.fusions[0].prepare =  [this.taskOptions.prepare, this.fusions[0].prepare];
         this.fusions[0].start =  [this.taskOptions.start, this.fusions[0].start];
         this.fusions[0].complete =  [this.taskOptions.complete, this.fusions[0].complete];
         this.fusions[0].always =  [this.taskOptions.always, this.fusions[0].always];
         this.fusions[0].fail =  [this.taskOptions.fail, this.fusions[0].fail];
+        this.fusions[0].end =  [this.taskOptions.end, this.fusions[0].end];
       }
     }
     else
@@ -55,6 +57,7 @@
 
   Action.prototype.prepare = function() {
     this.taskOptions = $.extend({}, this.options);
+    delete this.taskOptions.prepare;
     delete this.taskOptions.start;
     delete this.taskOptions.complete;
     delete this.taskOptions.always;
@@ -86,6 +89,7 @@
       options.repeat = options.repeat || animation.repeat || 1;
       options.fillMode = options.fillMode || animation.fillMode || 'none';
       options.timeout = options.timeout || 500;
+      options.prepare = [options.prepare, animation.prepare];
       options.start = [options.start, animation.start];
       options.complete = [animation.complete, options.complete];
       options.always = [animation.always, options.always];
@@ -93,12 +97,18 @@
       options.fail = [animation.fail, options.fail];
       options.name = animation.name;
       options.keyframes = animation.keyframes;
+      options.emptyAnimation = animation.emptyAnimation;
       options.variables = {};
       for(var variableName in animation.variables)
-        options.variables[variableName] = options[variableName] || animation.variables[variableName];
+      {
+        options.variables[variableName] = options[variableName];
+        if(options[variableName] === undefined)
+          options.variables[variableName] = animation.variables[variableName];
+      }
 
       this.jobsOptions.push(options);
     } 
+    this.taskOptions.prepare = this.options.prepare;
     this.taskOptions.start = this.options.start;
     this.taskOptions.complete = this.options.complete;
     this.taskOptions.always = this.options.always;
@@ -110,8 +120,11 @@
   {
     this.element = $(element);
     this.options = options;
+    this.options.element = this.element;
+    this.options.originalElement = this.element;
     this.jobsOptions = jobsOptions;
     this.reset = true;
+    this.started = false;
     this.counter = {
       complete: 0,
       fail: 0,
@@ -128,25 +141,26 @@
     ++tasks;
     this.element.attr('animation-tasks', tasks);
     this.ontasksend = this.ontasksend.bind(this);
+    this.onstart = this.onstart.bind(this);
     this.oncancel = this.oncancel.bind(this);
     this.onfinish = this.onfinish.bind(this);
     this.element.on('tasksend', this.ontasksend);
     this.element.on('animationcancel', this.oncancel);
     this.element.on('animationfinish', this.onfinish);
-    callback(this.options.start, this.element, [this.options]);
+    callback(this.options.prepare, this.element[0], [this.options]);
 
     this.actor = this.element;
     var css = '';
     this.jobs = [];
     for(var i = 0;i < this.jobsOptions.length;++i)
     {
+      var options = $.extend({}, this.jobsOptions[i]);
       if(this.options.combinable || i > 0)
         this.actor = wrap(this.actor);
-      var options = $.extend({}, this.jobsOptions[i]);
       if(options.fillMode == 'forwards' || options.fillMode == 'both')
         this.reset = false;
 
-      callback(options.start, this.actor[0], [options])
+      callback(options.prepare, this.actor[0], [options]);
       if(options.keyframes)
       {
         options.name = 'a' + ++id;
@@ -157,9 +171,12 @@
         });
       }
 
+      options.start = [options.start, this.onstart.bind(this)];
       options.complete = [options.complete, this.oncomplete.bind(this)];
       options.fail = [options.fail, this.onfail.bind(this)];
       options.always = [options.always, this.onalways.bind(this)];
+      options.originalElement = this.element;
+      options.element = this.actor;
       this.jobs.push(new Job(this.actor, options));
     }
 
@@ -192,6 +209,13 @@
       return;
     this.element.trigger('animationcancel');
     this.element.attr('animation-combinable', 1);
+  };
+
+  Task.prototype.onstart = function() {
+    if(this.started)
+      return;
+    this.started = true;
+    callback(this.options.start, this.element[0], [this.options]);
   };
 
   Task.prototype.oncomplete = function() {
@@ -268,8 +292,7 @@
   };
 
   Task.prototype.clear = function() {
-    this.element.css('animation', '');
-    this.element.css(vendorPrefix + 'animation', '');
+    this.element.vendorCss('animation', '');
     if(this.style)
       this.style.remove();
     if(!this.cleaner)
@@ -297,35 +320,43 @@
     var options = this.options;
     var element = this.element;
 
-    // name duration timing-function delay iteration-count direction fill-mode play-state
-    var properties = [
-      options.name, 
-      options.duration / 1000 + 's', 
-      options.easing, 
-      options.delay / 1000 + 's', 
-      options.repeat, 
-      options.direction,
-      options.fillMode
-      // 'forwards'
-    ].join(' ');
-    element.css('animation', properties);
-    element.css(vendorPrefix + 'animation', properties);
-
     this.onstart = this.onstart.bind(this);
-    this.onend = this.onend.bind(this);
     this.onfail = this.onfail.bind(this);
     this.oncancel = this.oncancel.bind(this);
     this.onfinish = this.onfinish.bind(this);
     element.on(animationstart, this.onstart);
-    element.on(animationend, this.onend);
     element.on('animationfail', this.onfail);
     element.on('animationcancel', this.oncancel);
     element.on('animationfinish', this.onfinish);
-    observe(element, new Date().getTime() + options.delay + options.timeout);
+    if(options.emptyAnimation)
+    {
+      setTimeout(this.onstart, options.delay);
+      setTimeout(function(){
+        this.finish(true);
+      }.bind(this), options.delay + options.duration);
+    }
+    else
+    {
+      // name duration timing-function delay iteration-count direction fill-mode play-state
+      var properties = [
+        options.name, 
+        options.duration / 1000 + 's', 
+        options.easing, 
+        options.delay / 1000 + 's', 
+        options.repeat, 
+        options.direction,
+        options.fillMode
+      ].join(' ');
+      element.vendorCss('animation', properties);
+      this.onend = this.onend.bind(this);
+      element.on(animationend, this.onend);
+      observe(element, new Date().getTime() + options.delay + options.timeout);
+    }
   };
 
   Job.prototype.onstart = function(e) {
     unobserve(this.element);
+    callback(this.options.start, this.element[0], [this.options]);
   };
 
   Job.prototype.onfail = function(e) {
@@ -368,7 +399,9 @@
     'normal': 1,
     'alternate': 2
   };
-  function calculateDirection(direction1, direction2) {
+
+  function calculateDirection(direction1, direction2) 
+  {
     direction1 = direction1 || 'normal';
     direction2 = direction2 || 'normal';
     switch(directions[direction1] * directions[direction2])
@@ -385,7 +418,7 @@
       default:
         return direction1;
     }
-  };
+  }
 
   function checkFail()
   {
@@ -431,25 +464,47 @@
       else if($.isArray(callbacks[i]))
         callback(callbacks[i], thisArg, argsArray);
     }
-  };
+  }
 
   function wrap(element) 
   {
     var wrapper = $('<span></span>');
-    if(element.css('display') == 'block')
+    var display = element.attr('display') || element.css('display');
+    if(display == 'block')
       wrapper.css('display', 'block');
     else if(supportFlex)
       wrapper.css('display', 'inline-flex');
     else
       wrapper.css('display', 'inline-block');
     wrapper.attr('animation-wrapper', 1);
+    if(element.css('float') != 'none')
+    {
+      wrapper.height(element.height());
+      wrapper.width(element.width());
+      wrapper.css('float', element.css('float'));
+    }
     element.wrap(wrapper);
+    element.attr('display', display);
     return element.parent();
+  }
+
+  function saveStyle(element, properties)
+  {
+    var style = {};
+    for(var i = 0;i < properties.length;++i)
+      style[properties[i]] = element.style[properties[i]];
+    return style;
+  }
+
+  function restoreStyle(element, style)
+  {
+    for(var propertyName in style)
+      element.style[propertyName] = style[propertyName];
   }
 
   function generateKeyframeCss(options) {
     return generateKeyframeCssByPrefix('', options) + generateKeyframeCssByPrefix(vendorPrefix, options);
-  };
+  }
 
   function generateKeyframeCssByPrefix(prefix, options) {
     var css = '@';
@@ -476,7 +531,7 @@
     }
     css += '}';
     return css;
-  };
+  }
 
   function defineAnimation(name, keyframes)
   {
@@ -508,6 +563,8 @@
   $.animations = {};
   $.wrap = wrap;
   $.defineAnimation = defineAnimation;
+  $.saveStyle = saveStyle;
+  $.restoreStyle = restoreStyle;
 
   var origAnimate = $.fn.animate;
   $.fn.animate = function(param1, param2) {
@@ -516,7 +573,8 @@
       animate.call(this, param1, param2);
       return this;
     }
-    else if(typeof param1 == 'object' && param1.keyframes)
+    else if(typeof param1 == 'object' && 
+      (param1.keyframes || param1.name || param1.emptyAnimation))
     {
       new Action(this, [param1], {}).start();
       return this;
@@ -543,6 +601,11 @@
       return this.trigger('animationreset');
   };
 
+  $.fn.vendorCss = function(propertyName, value) {
+    this.css(propertyName, value);
+    this.css(vendorPrefix + propertyName, value);
+  };
+
   var timer = setInterval(checkFail, 100);
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
@@ -558,7 +621,7 @@
     variables: {
       strength: 20
     },
-    start: function(options) {
+    prepare: function(options) {
       var strength = options.variables.strength;
       if(!$.isNumeric(options.variables.strength))
         strength = 20;
@@ -596,7 +659,7 @@
     variables: {
       distance: null
     },
-    start: function(options) {
+    prepare: function(options) {
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
@@ -650,7 +713,7 @@
     variables: {
       strength: 10
     },
-    start: function(options) {
+    prepare: function(options) {
       var strength = options.variables.strength;
       if(!$.isNumeric(options.variables.strength))
         strength = 10;
@@ -671,8 +734,9 @@
     variables: {
       distance: null
     },
-    start: function(options) {
+    prepare: function(options) {
       var element = $(this);
+      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom']);
       var w = element.outerWidth();
       var h = element.outerHeight();
       var wrapper = $.wrap(element);
@@ -685,12 +749,6 @@
         'height': h + 'px',
         'overflow': 'hidden'
       });
-      options.margin = {
-        left: this.style.marginLeft,
-        right: this.style.marginRight,
-        top: this.style.marginTop,
-        bottom: this.style.marginBottom
-      };
       element.css('margin', '0');
       var variables = options.variables;
       var distance;
@@ -718,10 +776,7 @@
       }
     },
     end: function(options) {
-      this.style.marginLeft = options.margin.left;
-      this.style.marginRight = options.margin.right;
-      this.style.marginTop = options.margin.top;
-      this.style.marginBottom = options.margin.bottom;
+      $.restoreStyle(this, options.save);
     }
   };
 
@@ -731,4 +786,158 @@
     if(name.indexOf('To') != -1)
       $.animations[name].direction = 'reverse';
   });
+})(jQuery, window, document);
+;;(function($, window, document, undefined) {
+  function tile(wrapper, element, rows, cols) {
+    var width = element.outerWidth();
+    var height = element.outerHeight();
+    var tileWidth = width / cols;
+    var tileHeight = height / rows;
+    var tiles = [];
+    for(var i = 0;i < rows;++i)
+    {
+      var rowTiles = [];
+      for(var j = 0;j < cols;++j)
+      {
+        var clone = i == 0 && j == 0 ? element : element.clone();
+        var container = $.wrap(clone);
+        container.css({
+          width: width,
+          height: height,
+          display: 'inline-block'
+        });
+        var x = -j * tileWidth;
+        var y = -i * tileHeight;
+        container.vendorCss('transform', 'translate(' + x + 'px, ' + y + 'px)');
+        var tile = $.wrap(container);
+        tile.css({
+          width: tileWidth,
+          height: tileHeight,
+          overflow: 'hidden',
+          display: 'inline-block',
+          float: 'left'
+        });
+        rowTiles.push(tile);
+        wrapper.append(tile);
+      }
+      tiles.push(rowTiles);
+    }
+    var display = wrapper.css('display') == 'block' ? 'block' : 'inline-block';
+    wrapper.css({
+      width: width,
+      height: height,
+      display: display
+    });
+    return tiles;
+  }
+
+  function validate(variable, defaultValue)
+  {
+    if(variable && $.isNumeric(variable) && variable > 0)
+      return variable;
+    return defaultValue;
+  }
+
+  var animation = {
+    duration: 1000,
+    emptyAnimation: true,
+    variables: {
+      rows: 2,
+      cols: 2,
+      effect: 'flyOut',
+      alternate: null,
+      ordering: true,
+      order: 'lrtb',
+      cycle: null,
+      adjustDuration: true
+    },
+    prepare: function(options) {
+      var element = $(this);
+      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height']);
+      element.css({
+        width: element.width() + 'px',
+        height: element.height() + 'px'
+      });
+      var wrapper = $.wrap(element);wrapper.css({
+        'margin-left': element.css('margin-left'),
+        'margin-right': element.css('margin-right'),
+        'margin-top': element.css('margin-top'),
+        'margin-bottom': element.css('margin-bottom')
+      });
+      element.css('margin', '0');
+      var rows = validate(options.variables.rows, 1);
+      var cols = validate(options.variables.cols, 1);
+      var tiles = tile(wrapper, element, rows, cols);
+
+      var subOptions = {};
+      subOptions.duration = options.duration;
+      subOptions.easing = options.easing;
+      subOptions.delay = options.delay;
+      subOptions.direction = options.direction;
+      subOptions.repeat = options.repeat;
+      subOptions.fillMode = options.fillMode;
+
+      var tilesCount = rows * cols;
+      var delay = subOptions.duration / tilesCount;
+      var alternate = options.variables.alternate || options.variables.effect;
+      var cycle = validate(options.variables.cycle, tilesCount);
+      var leftToRight = true;
+      var topToBottom = true;
+      switch(options.variables.order)
+      {
+        case 'rl':
+        case 'rltb':
+        case 'tbrl':
+          leftToRight = false;
+          break;
+        case 'bt':
+        case 'lrbt':
+        case 'btlr':
+          topToBottom = false;
+          break;
+        case 'btrl':
+        case 'rlbt':
+          leftToRight = false;
+          topToBottom = false;
+          break;
+        case 'lrtb':
+        default:
+          break;
+      }
+
+      if(!topToBottom)
+        tiles = tiles.reverse();
+
+      for(var i = 0;i < rows;++i)
+      {
+        var rowTiles = tiles[i];
+        if(!leftToRight)
+          rowTiles = rowTiles.reverse();
+        for(var j = 0;j < cols;++j)
+        {
+          var cloneOptions = $.extend({}, subOptions);
+          if(options.variables.ordering)
+          {
+            var count = (j + i * cols);
+            if(parseInt(count / cycle) % 2 == 0)
+              count = count % cycle;
+            else
+              count = cycle - (count % cycle);
+            cloneOptions.delay += delay * count;
+            if(options.variables.adjustDuration)
+              cloneOptions.duration -= cloneOptions.delay;
+          }
+          if((j % 2) ^ (i % 2))
+            rowTiles[j].animate(options.variables.effect, cloneOptions);
+          else
+            rowTiles[j].animate(alternate, cloneOptions);
+        }
+      }
+    },
+    end: function(options) {
+      $.restoreStyle(this, options.save);
+    }
+  };
+
+  $.animations['tile'] = animation;
 })(jQuery, window, document);

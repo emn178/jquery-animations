@@ -51,17 +51,16 @@
 
   var animation = {
     duration: 1000,
-    name: 'empty',
+    emptyAnimation: true,
     variables: {
       rows: 2,
       cols: 2,
       effect: 'flyOut',
       alternate: null,
       ordering: true,
-      order: 'lrtb'
-    },
-    wrap: function() {
-
+      order: 'lrtb',
+      cycle: null,
+      adjustDuration: true
     },
     prepare: function(options) {
       var element = $(this);
@@ -92,6 +91,7 @@
       var tilesCount = rows * cols;
       var delay = subOptions.duration / tilesCount;
       var alternate = options.variables.alternate || options.variables.effect;
+      var cycle = validate(options.variables.cycle, tilesCount);
       var leftToRight = true;
       var topToBottom = true;
       switch(options.variables.order)
@@ -130,8 +130,13 @@
           if(options.variables.ordering)
           {
             var count = (j + i * cols);
+            if(parseInt(count / cycle) % 2 == 0)
+              count = count % cycle;
+            else
+              count = cycle - (count % cycle);
             cloneOptions.delay += delay * count;
-            cloneOptions.duration -= cloneOptions.delay;
+            if(options.variables.adjustDuration)
+              cloneOptions.duration -= cloneOptions.delay;
           }
           if((j % 2) ^ (i % 2))
             rowTiles[j].animate(options.variables.effect, cloneOptions);

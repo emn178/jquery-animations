@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.2.3
+ * jQuery-animations v0.3.0
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -57,7 +57,6 @@
 
   Action.prototype.prepare = function() {
     this.taskOptions = $.extend({}, this.options);
-    delete this.taskOptions.bundle;
     delete this.taskOptions.prepare;
     delete this.taskOptions.start;
     delete this.taskOptions.complete;
@@ -98,7 +97,7 @@
       options.fail = [animation.fail, options.fail];
       options.name = animation.name;
       options.keyframes = animation.keyframes;
-      options.bundle = animation.bundle || options.bundle;
+      options.emptyAnimation = animation.emptyAnimation;
       options.variables = {};
       for(var variableName in animation.variables)
       {
@@ -321,30 +320,38 @@
     var options = this.options;
     var element = this.element;
 
-    // name duration timing-function delay iteration-count direction fill-mode play-state
-    var properties = [
-      options.name, 
-      options.duration / 1000 + 's', 
-      options.easing, 
-      options.delay / 1000 + 's', 
-      options.repeat, 
-      options.direction,
-      options.fillMode
-      // 'forwards'
-    ].join(' ');
-    element.vendorCss('animation', properties);
-
     this.onstart = this.onstart.bind(this);
-    this.onend = this.onend.bind(this);
     this.onfail = this.onfail.bind(this);
     this.oncancel = this.oncancel.bind(this);
     this.onfinish = this.onfinish.bind(this);
     element.on(animationstart, this.onstart);
-    element.on(animationend, this.onend);
     element.on('animationfail', this.onfail);
     element.on('animationcancel', this.oncancel);
     element.on('animationfinish', this.onfinish);
-    observe(element, new Date().getTime() + options.delay + options.timeout);
+    if(options.emptyAnimation)
+    {
+      setTimeout(this.onstart, options.delay);
+      setTimeout(function(){
+        this.finish(true);
+      }.bind(this), options.delay + options.duration);
+    }
+    else
+    {
+      // name duration timing-function delay iteration-count direction fill-mode play-state
+      var properties = [
+        options.name, 
+        options.duration / 1000 + 's', 
+        options.easing, 
+        options.delay / 1000 + 's', 
+        options.repeat, 
+        options.direction,
+        options.fillMode
+      ].join(' ');
+      element.vendorCss('animation', properties);
+      this.onend = this.onend.bind(this);
+      element.on(animationend, this.onend);
+      observe(element, new Date().getTime() + options.delay + options.timeout);
+    }
   };
 
   Job.prototype.onstart = function(e) {
@@ -392,7 +399,9 @@
     'normal': 1,
     'alternate': 2
   };
-  function calculateDirection(direction1, direction2) {
+
+  function calculateDirection(direction1, direction2) 
+  {
     direction1 = direction1 || 'normal';
     direction2 = direction2 || 'normal';
     switch(directions[direction1] * directions[direction2])
@@ -409,7 +418,7 @@
       default:
         return direction1;
     }
-  };
+  }
 
   function checkFail()
   {
@@ -455,7 +464,7 @@
       else if($.isArray(callbacks[i]))
         callback(callbacks[i], thisArg, argsArray);
     }
-  };
+  }
 
   function wrap(element) 
   {
@@ -495,7 +504,7 @@
 
   function generateKeyframeCss(options) {
     return generateKeyframeCssByPrefix('', options) + generateKeyframeCssByPrefix(vendorPrefix, options);
-  };
+  }
 
   function generateKeyframeCssByPrefix(prefix, options) {
     var css = '@';
@@ -522,7 +531,7 @@
     }
     css += '}';
     return css;
-  };
+  }
 
   function defineAnimation(name, keyframes)
   {
@@ -564,7 +573,8 @@
       animate.call(this, param1, param2);
       return this;
     }
-    else if(typeof param1 == 'object' && param1.keyframes)
+    else if(typeof param1 == 'object' && 
+      (param1.keyframes || param1.name || param1.emptyAnimation))
     {
       new Action(this, [param1], {}).start();
       return this;
@@ -597,8 +607,4 @@
   };
 
   var timer = setInterval(checkFail, 100);
-  $.defineAnimation('empty', {
-    from: {  },
-    to: {  }
-  });
 })(jQuery, window, document);

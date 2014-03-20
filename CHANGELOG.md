@@ -1,8 +1,7 @@
-# v0.3.0 / 2014-03-19
+# v0.3.0 / 2014-03-20
 
 * Add prepare callback and update start callback.
 * Add $.fn.vendorCss(), $.saveStyle(), $.restoreStyle() methods.
-* Add empty keyframes.
 * Add tile plugin.
 * Update plugins.
 

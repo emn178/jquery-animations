@@ -9,30 +9,6 @@
     $('#image').animate(animation, options);
   }
 
-  // function add(animationId)
-  // {
-  //   var element = $('.global').clone();
-  //   element.removeClass('global').addClass('custom disable').attr('id', 'option-' + animationId).attr('animation-id', animationId);
-  //   element.find('h5').text(animationId);
-  //   var animation = $.animations[animationId];
-  //   element.find('label').each(function() {
-  //     var label = $(this);
-  //     var variable = label.attr('for');
-  //     if(label.hasClass('custom') && !(animation.variables && variable in animation.variables))
-  //     {
-  //       element.find('[name=' + variable + ']').remove();
-  //       label.remove();
-  //     }
-  //     else
-  //       label.attr('for', animationId + '-' + variable);
-  //   });
-  //   element.find('input,select').each(function(){
-  //     $(this).attr('id', animationId + '-' + $(this).attr('id'));
-  //     $(this).val('');
-  //   });
-  //   $('#options-wrap').append(element);
-  // }
-
   function update()
   {
     var isCombine = $('#combine').is(':checked');
@@ -71,24 +47,6 @@
         options[name] = value;
     });
 
-
-    // $('.custom:not(.disable)').each(function() {
-    //   var custom = $(this);
-    //   var id = custom.attr('animation-id');
-    //   options.custom = options.custom || {};
-    //   var customOptions = options.custom[id] = {};
-    //   custom.find('input, select').each(function() {
-    //     var element = $(this);
-    //     var name = element.attr('name');
-    //     var value = element.val();
-    //     if(element.attr('type') == 'number')
-    //       value = parseInt(value);
-    //     if(value)
-    //       customOptions[name] = value;
-    //   });
-    //   if($.isEmptyObject(customOptions))
-    //     delete options.custom[id];
-    // });
     if($.isEmptyObject(options.custom))
       delete options.custom;
 
@@ -129,12 +87,22 @@
     $('#submit').click(animate);
     $('body').on('change', 'input,select', update);
 
+    var img = $('#image')[0];
+    if(img.complete || img.readyState === 4)
+      splash();
+    else
+      $('#image').bind('load', splash);
+  });
+
+  function splash()
+  {
     $('#image').animate('tile', {
       duration: 2000,
       rows: 8,
       cols: 8,
       effect: 'flyIn',
+      order: 'random',
       fillMode: 'backwards'
     });
-  });
+  }
 })(jQuery, window, document);
