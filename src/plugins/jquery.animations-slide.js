@@ -10,8 +10,9 @@
     variables: {
       distance: null
     },
-    start: function(options) {
+    prepare: function(options) {
       var element = $(this);
+      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom']);
       var w = element.outerWidth();
       var h = element.outerHeight();
       var wrapper = $.wrap(element);
@@ -24,12 +25,6 @@
         'height': h + 'px',
         'overflow': 'hidden'
       });
-      options.margin = {
-        left: this.style.marginLeft,
-        right: this.style.marginRight,
-        top: this.style.marginTop,
-        bottom: this.style.marginBottom
-      };
       element.css('margin', '0');
       var variables = options.variables;
       var distance;
@@ -57,10 +52,7 @@
       }
     },
     end: function(options) {
-      this.style.marginLeft = options.margin.left;
-      this.style.marginRight = options.margin.right;
-      this.style.marginTop = options.margin.top;
-      this.style.marginBottom = options.margin.bottom;
+      $.restoreStyle(this, options.save);
     }
   };
 

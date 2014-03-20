@@ -10,7 +10,7 @@
     variables: {
       distance: null
     },
-    start: function(options) {
+    prepare: function(options) {
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
