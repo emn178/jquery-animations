@@ -4,11 +4,11 @@
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Jquery-animations : A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use." />
+    <meta name="description" content="jQuery-animations : A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use." />
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>Jquery-animations</title>
+    <title>jQuery-animations</title>
   </head>
 
   <body>
@@ -18,7 +18,7 @@
         <header class="inner">
           <a id="forkme_banner" href="https://github.com/emn178/jquery-animations">View on GitHub</a>
 
-          <h1 id="project_title">Jquery-animations</h1>
+          <h1 id="project_title">jQuery-animations</h1>
           <h2 id="project_tagline">A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use.</h2>
 
             <section id="downloads">
@@ -48,7 +48,7 @@
 <h2>
 <a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h2>
 
-<p><a href="http://emn178.github.io/jquery-animations/samples/effects/">Effects</a><br><a href="http://jsfiddle.net/emn178/vN8V8/">Integrate with CSS Library</a></p>
+<p><a href="http://emn178.github.io/jquery-animations/samples/effects/">Effects</a><br><a href="http://emn178.github.io/jquery-animations/samples/tile/">Tile</a><br><a href="http://jsfiddle.net/emn178/vN8V8/">Integrate with CSS Library</a></p>
 
 <h2>
 <a name="browser-support" class="anchor" href="#browser-support"><span class="octicon octicon-link"></span></a>Browser Support</h2>
@@ -131,6 +131,12 @@
 </h6>
 
 <p>Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.</p>
+
+<h6>
+<a name="prepare-functionoptions" class="anchor" href="#prepare-functionoptions"><span class="octicon octicon-link"></span></a><em>prepare: <code>Function(options)</code></em>
+</h6>
+
+<p>Sets the callback function to call once animations are ready to begin.</p>
 
 <h6>
 <a name="start-functionoptions" class="anchor" href="#start-functionoptions"><span class="octicon octicon-link"></span></a><em>start: <code>Function(options)</code></em>
@@ -271,6 +277,9 @@
   <span class="c1">// Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.</span>
   <span class="nx">combinable</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
 
+  <span class="c1">// Sets the callback function to call once animations are ready to begin.</span>
+  <span class="nx">prepare</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+
   <span class="c1">// Sets the callback function to call once the animation begins..</span>
   <span class="nx">start</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
 
@@ -325,7 +334,7 @@ Author: <a href="mailto:emn178@gmail.com">emn178@gmail.com</a></p>
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">Jquery-animations maintained by <a href="https://github.com/emn178">emn178</a></p>
+        <p class="copyright">jQuery-animations maintained by <a href="https://github.com/emn178">emn178</a></p>
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
