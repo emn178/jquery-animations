@@ -62,6 +62,9 @@ Available values please refer to [animation-fill-mode](http://www.w3schools.com/
 ###### *combinable: `Boolean` (default: `false`)*
 Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.
 
+###### *wrap: `Boolean` (default: `false`)*
+Sets the flag determining the animations applies to a new wrapper.
+
 ###### *prepare: `Function(options)`*
 Sets the callback function to call once animations are ready to begin.
 
@@ -79,6 +82,9 @@ Sets the callback function to call when the animation completes or stops without
 
 ###### *end: `Function(options)`*
 Sets the callback function to call when the animation completes or stops without completing. But, if there is any animation running inside target element, it won't trigger untill all done.
+
+###### *clear: `Function(options)`*
+Sets the callback function to call when the animation clear or reset triggered.
 
 ###### *custom: `Object`*
 Set customized options for each animation. Defines the same key as animation ID or name in this object. Customized options structure is the same with options of global.

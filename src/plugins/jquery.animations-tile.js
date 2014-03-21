@@ -2,32 +2,58 @@
   function tile(wrapper, element, rows, cols) {
     var width = element.outerWidth();
     var height = element.outerHeight();
-    var tileWidth = width / cols;
-    var tileHeight = height / rows;
+    var tileWidth = Math.round(width / cols);
+    var tileHeight = Math.round(height / rows);
+    var lastTileWidth = width - tileWidth * (cols - 1);
+    var lastTileHeight = height - tileHeight * (rows - 1);
     var tiles = [];
+    var isImg = element[0].tagName == 'IMG';
+    if(isImg)
+    {
+      var src = element.attr('src');
+      element.hide();
+    }
     for(var i = 0;i < rows;++i)
     {
       var rowTiles = [];
+      var useHeight = i == rows - 1 ? lastTileHeight : tileHeight;
       for(var j = 0;j < cols;++j)
       {
-        var clone = i == 0 && j == 0 ? element : element.clone();
-        var container = $.wrap(clone);
-        container.css({
-          width: width,
-          height: height,
-          display: 'inline-block'
-        });
-        var x = -j * tileWidth;
-        var y = -i * tileHeight;
-        container.vendorCss('transform', 'translate(' + x + 'px, ' + y + 'px)');
-        var tile = $.wrap(container);
-        tile.css({
-          width: tileWidth,
-          height: tileHeight,
-          overflow: 'hidden',
-          display: 'inline-block',
-          float: 'left'
-        });
+        var useWidth = j == cols - 1 ? lastTileWidth : tileWidth;
+        var x = -((j - 1) * tileWidth + useWidth);
+        var y = -((i - 1) * tileHeight + useHeight);
+        if(isImg)
+        {
+          var tile = $('<span></span>');
+          tile.css({
+            width: useWidth,
+            height: useHeight,
+            display: 'inline-block',
+            float: 'left',
+            'background-position': x + 'px ' + y + 'px',
+            'background-image': 'url(' + src + ')'
+          });
+        }
+        else
+        {
+          var clone = i == 0 && j == 0 ? element : element.clone();
+          var container = $.wrap(clone);
+          container.css({
+            width: width,
+            height: height,
+            display: 'inline-block'
+          });
+          container.vendorCss('transform', 'translate(' + x + 'px, ' + y + 'px)');
+          var tile = $.wrap(container);
+          tile.css({
+            width: useWidth,
+            height: useHeight,
+            overflow: 'hidden',
+            display: 'inline-block',
+            float: 'left'
+          });
+        }
+        
         rowTiles.push(tile);
         wrapper.append(tile);
       }
@@ -52,9 +78,10 @@
   var animation = {
     duration: 1000,
     emptyAnimation: true,
+    wrap: true,
     variables: {
-      rows: 2,
-      cols: 2,
+      rows: 1,
+      cols: 1,
       effect: 'flyOut',
       alternate: null,
       ordering: true,
@@ -64,10 +91,10 @@
     },
     prepare: function(options) {
       var element = $(this);
-      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height']);
+      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display']);
       element.css({
-        width: element.width() + 'px',
-        height: element.height() + 'px'
+        width: element.outerWidth() + 'px',
+        height: element.outerHeight() + 'px'
       });
       var wrapper = $.wrap(element);wrapper.css({
         'margin-left': element.css('margin-left'),
@@ -87,6 +114,8 @@
       subOptions.direction = options.direction;
       subOptions.repeat = options.repeat;
       subOptions.fillMode = options.fillMode;
+      subOptions.timeout = options.timeout;
+      subOptions.noClear = true;
 
       var tilesCount = rows * cols;
       var delay = subOptions.duration / tilesCount;
@@ -144,8 +173,9 @@
             rowTiles[j].animate(alternate, cloneOptions);
         }
       }
+      options.wrapper = wrapper;
     },
-    end: function(options) {
+    clear: function(options) {
       $.restoreStyle(this, options.save);
     }
   };

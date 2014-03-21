@@ -51,7 +51,7 @@
           break;
       }
     },
-    end: function(options) {
+    clear: function(options) {
       $.restoreStyle(this, options.save);
     }
   };

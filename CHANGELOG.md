@@ -1,3 +1,10 @@
+# v0.3.1 / 2014-03-21
+
+* Add noClear option.
+* Add wrap feature for support special plugin combinable.
+* Add clear callback.
+* Optimize tile plugin.
+
 # v0.3.0 / 2014-03-20
 
 * Add prepare callback and update start callback.

@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.3.0
+ * jQuery-animations v0.3.1
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -43,6 +43,7 @@
         this.fusions[0].always =  [this.taskOptions.always, this.fusions[0].always];
         this.fusions[0].fail =  [this.taskOptions.fail, this.fusions[0].fail];
         this.fusions[0].end =  [this.taskOptions.end, this.fusions[0].end];
+        this.fusions[0].clear =  [this.taskOptions.clear, this.fusions[0].clear];
       }
     }
     else
@@ -61,8 +62,9 @@
     delete this.taskOptions.start;
     delete this.taskOptions.complete;
     delete this.taskOptions.always;
-    delete this.taskOptions.end;
     delete this.taskOptions.fail;
+    delete this.taskOptions.end;
+    delete this.taskOptions.clear;
     this.jobsOptions = [];
     this.fusions = [];
     var custom = this.taskOptions.custom || {};
@@ -93,11 +95,13 @@
       options.start = [options.start, animation.start];
       options.complete = [animation.complete, options.complete];
       options.always = [animation.always, options.always];
-      options.end = [animation.end, options.end];
       options.fail = [animation.fail, options.fail];
+      options.end = [animation.end, options.end];
+      options.clear = [animation.clear, options.clear];
       options.name = animation.name;
       options.keyframes = animation.keyframes;
       options.emptyAnimation = animation.emptyAnimation;
+      options.wrap = animation.wrap || options.wrap;
       options.variables = {};
       for(var variableName in animation.variables)
       {
@@ -112,8 +116,9 @@
     this.taskOptions.start = this.options.start;
     this.taskOptions.complete = this.options.complete;
     this.taskOptions.always = this.options.always;
-    this.taskOptions.end = this.options.end;
     this.taskOptions.fail = this.options.fail;
+    this.taskOptions.end = this.options.end;
+    this.taskOptions.clear = this.options.clear;
   };
 
   function Task(element, options, jobsOptions)
@@ -152,6 +157,9 @@
     this.actor = this.element;
     var css = '';
     this.jobs = [];
+    this.jobsOptions.sort(function(a, b) {
+      return a.wrap ? -1 : (b.wrap ? 1 : 0);
+    });
     for(var i = 0;i < this.jobsOptions.length;++i)
     {
       var options = $.extend({}, this.jobsOptions[i]);
@@ -159,6 +167,8 @@
         this.actor = wrap(this.actor);
       if(options.fillMode == 'forwards' || options.fillMode == 'both')
         this.reset = false;
+      if(options.wrap)
+        var wrapper = wrap(this.actor);
 
       callback(options.prepare, this.actor[0], [options]);
       if(options.keyframes)
@@ -178,6 +188,9 @@
       options.originalElement = this.element;
       options.element = this.actor;
       this.jobs.push(new Job(this.actor, options));
+
+      if(options.wrap)
+        this.actor = wrapper;
     }
 
     if(css)
@@ -189,6 +202,12 @@
 
     for(var i = 0;i < this.jobs.length;++i)
       this.jobs[i].start();
+
+    this.actor.find('[prepare-animation]').each(function() {
+      var element = $(this);
+      element.vendorCss('animation', element.attr('prepare-animation'));
+      element.removeAttr('prepare-animation');
+    });
   };
 
   Task.prototype.combine = function() {
@@ -251,7 +270,7 @@
     this.element.off('animationcancel', this.oncancel);
     this.element.off('animationfinish', this.onfinish);
     this.element.removeAttr('animation-combinable');
-    if(this.reset || this.counter.fail == this.counter.always)
+    if(!this.options.noClear && (this.reset || this.counter.fail == this.counter.always))
       this.clear();
     else
     {
@@ -297,6 +316,9 @@
       this.style.remove();
     if(!this.cleaner)
       return;
+    for(var i = 0;i < this.jobs.length;++i)
+      this.jobs[i].clear();
+    callback(this.options.clear, this.element[0], [this.options]);
     var wrapper = this.actor;
     while(wrapper.parent().attr('animation-wrapper') == 1)
       wrapper = wrapper.parent();
@@ -314,6 +336,7 @@
   {
     this.element = $(element);
     this.options = options;
+    this.prepare();
   }
 
   Job.prototype.start = function() {
@@ -330,28 +353,38 @@
     element.on('animationfinish', this.onfinish);
     if(options.emptyAnimation)
     {
-      setTimeout(this.onstart, options.delay);
-      setTimeout(function(){
-        this.finish(true);
-      }.bind(this), options.delay + options.duration);
+      this.startTimer = setTimeout(this.onstart, options.delay);
+      var repeat = parseInt(options.repeat);
+      if(!isNaN(repeat))
+      {
+        this.endTimer = setTimeout(function() {
+          this.finish(true);
+        }.bind(this), options.delay + options.duration * repeat);
+      }
     }
     else
     {
-      // name duration timing-function delay iteration-count direction fill-mode play-state
-      var properties = [
-        options.name, 
-        options.duration / 1000 + 's', 
-        options.easing, 
-        options.delay / 1000 + 's', 
-        options.repeat, 
-        options.direction,
-        options.fillMode
-      ].join(' ');
-      element.vendorCss('animation', properties);
+      element.vendorCss('animation', element.attr('prepare-animation'));
+      element.removeAttr('prepare-animation');
       this.onend = this.onend.bind(this);
       element.on(animationend, this.onend);
       observe(element, new Date().getTime() + options.delay + options.timeout);
     }
+  };
+
+  Job.prototype.prepare = function() {
+    var options = this.options;
+    var element = this.element;
+    var properties = [
+      options.name, 
+      options.duration / 1000 + 's', 
+      options.easing, 
+      options.delay / 1000 + 's', 
+      options.repeat, 
+      options.direction,
+      options.fillMode,
+    ].join(' ');
+    element.attr('prepare-animation', properties);
   };
 
   Job.prototype.onstart = function(e) {
@@ -385,12 +418,20 @@
     element.off('animationfail', this.onfail);
     element.off('animationcancel', this.oncancel);
     element.off('animationfinish', this.onfinish);
+    if(this.startTimer)
+      clearTimeout(this.startTimer);
+    if(this.endTimer)
+      clearTimeout(this.endTimer);
     callback(success ? options.complete : options.fail, this.element[0], [options]);
     callback(options.always, this.element[0], [this.options]);
   };
 
   Job.prototype.end = function() {
     callback(this.options.end, this.element[0], [this.options]);
+  };
+
+  Job.prototype.clear = function() {
+    callback(this.options.clear, this.element[0], [this.options]);
   };
 
   var directions = {
@@ -573,8 +614,7 @@
       animate.call(this, param1, param2);
       return this;
     }
-    else if(typeof param1 == 'object' && 
-      (param1.keyframes || param1.name || param1.emptyAnimation))
+    else if(typeof param1 == 'object' && param1.keyframes)
     {
       new Action(this, [param1], {}).start();
       return this;
@@ -775,7 +815,7 @@
           break;
       }
     },
-    end: function(options) {
+    clear: function(options) {
       $.restoreStyle(this, options.save);
     }
   };
@@ -791,32 +831,58 @@
   function tile(wrapper, element, rows, cols) {
     var width = element.outerWidth();
     var height = element.outerHeight();
-    var tileWidth = width / cols;
-    var tileHeight = height / rows;
+    var tileWidth = Math.round(width / cols);
+    var tileHeight = Math.round(height / rows);
+    var lastTileWidth = width - tileWidth * (cols - 1);
+    var lastTileHeight = height - tileHeight * (rows - 1);
     var tiles = [];
+    var isImg = element[0].tagName == 'IMG';
+    if(isImg)
+    {
+      var src = element.attr('src');
+      element.hide();
+    }
     for(var i = 0;i < rows;++i)
     {
       var rowTiles = [];
+      var useHeight = i == rows - 1 ? lastTileHeight : tileHeight;
       for(var j = 0;j < cols;++j)
       {
-        var clone = i == 0 && j == 0 ? element : element.clone();
-        var container = $.wrap(clone);
-        container.css({
-          width: width,
-          height: height,
-          display: 'inline-block'
-        });
-        var x = -j * tileWidth;
-        var y = -i * tileHeight;
-        container.vendorCss('transform', 'translate(' + x + 'px, ' + y + 'px)');
-        var tile = $.wrap(container);
-        tile.css({
-          width: tileWidth,
-          height: tileHeight,
-          overflow: 'hidden',
-          display: 'inline-block',
-          float: 'left'
-        });
+        var useWidth = j == cols - 1 ? lastTileWidth : tileWidth;
+        var x = -((j - 1) * tileWidth + useWidth);
+        var y = -((i - 1) * tileHeight + useHeight);
+        if(isImg)
+        {
+          var tile = $('<span></span>');
+          tile.css({
+            width: useWidth,
+            height: useHeight,
+            display: 'inline-block',
+            float: 'left',
+            'background-position': x + 'px ' + y + 'px',
+            'background-image': 'url(' + src + ')'
+          });
+        }
+        else
+        {
+          var clone = i == 0 && j == 0 ? element : element.clone();
+          var container = $.wrap(clone);
+          container.css({
+            width: width,
+            height: height,
+            display: 'inline-block'
+          });
+          container.vendorCss('transform', 'translate(' + x + 'px, ' + y + 'px)');
+          var tile = $.wrap(container);
+          tile.css({
+            width: useWidth,
+            height: useHeight,
+            overflow: 'hidden',
+            display: 'inline-block',
+            float: 'left'
+          });
+        }
+        
         rowTiles.push(tile);
         wrapper.append(tile);
       }
@@ -841,9 +907,10 @@
   var animation = {
     duration: 1000,
     emptyAnimation: true,
+    wrap: true,
     variables: {
-      rows: 2,
-      cols: 2,
+      rows: 1,
+      cols: 1,
       effect: 'flyOut',
       alternate: null,
       ordering: true,
@@ -853,10 +920,10 @@
     },
     prepare: function(options) {
       var element = $(this);
-      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height']);
+      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display']);
       element.css({
-        width: element.width() + 'px',
-        height: element.height() + 'px'
+        width: element.outerWidth() + 'px',
+        height: element.outerHeight() + 'px'
       });
       var wrapper = $.wrap(element);wrapper.css({
         'margin-left': element.css('margin-left'),
@@ -876,6 +943,8 @@
       subOptions.direction = options.direction;
       subOptions.repeat = options.repeat;
       subOptions.fillMode = options.fillMode;
+      subOptions.timeout = options.timeout;
+      subOptions.noClear = true;
 
       var tilesCount = rows * cols;
       var delay = subOptions.duration / tilesCount;
@@ -933,8 +1002,9 @@
             rowTiles[j].animate(alternate, cloneOptions);
         }
       }
+      options.wrapper = wrapper;
     },
-    end: function(options) {
+    clear: function(options) {
       $.restoreStyle(this, options.save);
     }
   };
