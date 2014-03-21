@@ -97,12 +97,12 @@
   function splash()
   {
     $('#image').animate('tile', {
-      duration: 2000,
-      rows: 8,
+      duration: 2500,
+      rows: 12,
       cols: 8,
       effect: 'flyIn',
       order: 'random',
-      fillMode: 'backwards'
+      fillMode: 'both'
     });
   }
 })(jQuery, window, document);
