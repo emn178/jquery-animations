@@ -102,7 +102,7 @@
       cols: 8,
       effect: 'flyIn',
       order: 'random',
-      fillMode: 'both'
+      fillMode: 'backwards'
     });
   }
 })(jQuery, window, document);

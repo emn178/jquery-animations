@@ -17,11 +17,11 @@
     {
       var rowTiles = [];
       var useHeight = i == rows - 1 ? lastTileHeight : tileHeight;
+      var y = -i * tileHeight;
       for(var j = 0;j < cols;++j)
       {
         var useWidth = j == cols - 1 ? lastTileWidth : tileWidth;
-        var x = -((j - 1) * tileWidth + useWidth);
-        var y = -((i - 1) * tileHeight + useHeight);
+        var x = -j * tileWidth;
         if(isImg)
         {
           var tile = $('<span></span>');

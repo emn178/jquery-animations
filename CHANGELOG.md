@@ -1,3 +1,7 @@
+# v0.3.2 / 2014-03-21
+
+* Hotfix tile plugin bug.
+
 # v0.3.1 / 2014-03-21
 
 * Add noClear option.
