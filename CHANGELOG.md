@@ -1,3 +1,8 @@
+# v0.3.3 / 2014-03-24
+
+* Rename events and attributes inside.
+* Simplify wrap method.
+
 # v0.3.2 / 2014-03-21
 
 * Hotfix tile plugin bug.

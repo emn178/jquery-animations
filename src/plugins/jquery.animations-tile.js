@@ -92,20 +92,20 @@
     prepare: function(options) {
       var element = $(this);
       options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display']);
-      element.css({
-        width: element.outerWidth() + 'px',
-        height: element.outerHeight() + 'px'
-      });
-      var wrapper = $.wrap(element);wrapper.css({
+      options.wrapper.css({
         'margin-left': element.css('margin-left'),
         'margin-right': element.css('margin-right'),
         'margin-top': element.css('margin-top'),
         'margin-bottom': element.css('margin-bottom')
       });
-      element.css('margin', '0');
+      element.css({
+        width: element.outerWidth() + 'px',
+        height: element.outerHeight() + 'px',
+        margin: '0'
+      });
       var rows = validate(options.variables.rows, 1);
       var cols = validate(options.variables.cols, 1);
-      var tiles = tile(wrapper, element, rows, cols);
+      var tiles = tile(options.wrapper, element, rows, cols);
 
       var subOptions = {};
       subOptions.duration = options.duration;
@@ -173,7 +173,6 @@
             rowTiles[j].animate(alternate, cloneOptions);
         }
       }
-      options.wrapper = wrapper;
     },
     clear: function(options) {
       $.restoreStyle(this, options.save);

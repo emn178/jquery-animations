@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.3.1
+ * jQuery-animations v0.3.3
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -149,7 +149,7 @@
     this.onstart = this.onstart.bind(this);
     this.oncancel = this.oncancel.bind(this);
     this.onfinish = this.onfinish.bind(this);
-    this.element.on('tasksend', this.ontasksend);
+    this.element.on('animationtasksend', this.ontasksend);
     this.element.on('animationcancel', this.oncancel);
     this.element.on('animationfinish', this.onfinish);
     callback(this.options.prepare, this.element[0], [this.options]);
@@ -168,7 +168,7 @@
       if(options.fillMode == 'forwards' || options.fillMode == 'both')
         this.reset = false;
       if(options.wrap)
-        var wrapper = wrap(this.actor);
+        options.wrapper = wrap(this.actor);
 
       callback(options.prepare, this.actor[0], [options]);
       if(options.keyframes)
@@ -190,7 +190,7 @@
       this.jobs.push(new Job(this.actor, options));
 
       if(options.wrap)
-        this.actor = wrapper;
+        this.actor = options.wrapper;
     }
 
     if(css)
@@ -203,10 +203,10 @@
     for(var i = 0;i < this.jobs.length;++i)
       this.jobs[i].start();
 
-    this.actor.find('[prepare-animation]').each(function() {
+    this.actor.find('[animation-prepare]').each(function() {
       var element = $(this);
-      element.vendorCss('animation', element.attr('prepare-animation'));
-      element.removeAttr('prepare-animation');
+      element.vendorCss('animation', element.attr('animation-prepare'));
+      element.removeAttr('animation-prepare');
     });
   };
 
@@ -260,16 +260,17 @@
     else
       this.element.attr('animation-tasks', tasks - 1);
     if(tasks == 1 && !this.hasOtherTasks())
-      this.element.trigger('tasksend');
+      this.element.trigger('animationtasksend');
   };
 
   Task.prototype.ontasksend = function() {
     if(!this.isDone())
       return;
-    this.element.off('tasksend', this.onend);
+    this.element.off('animationtasksend', this.onend);
     this.element.off('animationcancel', this.oncancel);
     this.element.off('animationfinish', this.onfinish);
     this.element.removeAttr('animation-combinable');
+    this.element.removeAttr('animation-display');
     if(!this.options.noClear && (this.reset || this.counter.fail == this.counter.always))
       this.clear();
     else
@@ -364,8 +365,8 @@
     }
     else
     {
-      element.vendorCss('animation', element.attr('prepare-animation'));
-      element.removeAttr('prepare-animation');
+      element.vendorCss('animation', element.attr('animation-prepare'));
+      element.removeAttr('animation-prepare');
       this.onend = this.onend.bind(this);
       element.on(animationend, this.onend);
       observe(element, new Date().getTime() + options.delay + options.timeout);
@@ -384,7 +385,7 @@
       options.direction,
       options.fillMode,
     ].join(' ');
-    element.attr('prepare-animation', properties);
+    element.attr('animation-prepare', properties);
   };
 
   Job.prototype.onstart = function(e) {
@@ -510,7 +511,7 @@
   function wrap(element) 
   {
     var wrapper = $('<span></span>');
-    var display = element.attr('display') || element.css('display');
+    var display = element.attr('animation-display') || element.css('display');
     if(display == 'block')
       wrapper.css('display', 'block');
     else if(supportFlex)
@@ -519,13 +520,9 @@
       wrapper.css('display', 'inline-block');
     wrapper.attr('animation-wrapper', 1);
     if(element.css('float') != 'none')
-    {
-      wrapper.height(element.height());
-      wrapper.width(element.width());
       wrapper.css('float', element.css('float'));
-    }
     element.wrap(wrapper);
-    element.attr('display', display);
+    element.attr('animation-display', display);
     return element.parent();
   }
 

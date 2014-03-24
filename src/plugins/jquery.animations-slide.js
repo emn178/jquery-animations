@@ -7,6 +7,7 @@
   var animation = {
     duration: 1000,
     keyframes: keyframes,
+    wrap: true,
     variables: {
       distance: null
     },
@@ -15,8 +16,7 @@
       options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom']);
       var w = element.outerWidth();
       var h = element.outerHeight();
-      var wrapper = $.wrap(element);
-      wrapper.css({
+      options.wrapper.css({
         'margin-left': element.css('margin-left'),
         'margin-right': element.css('margin-right'),
         'margin-top': element.css('margin-top'),
