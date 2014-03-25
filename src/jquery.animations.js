@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.3.6
+ * jQuery-animations v0.3.7
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -35,15 +35,15 @@
     this.prepare();
     if(this.jobsOptions.length == 0)
     {
-      if(this.fusions.length > 0)
+      if(this.shortcuts.length > 0)
       {
-        this.fusions[0].prepare =  [this.taskOptions.prepare, this.fusions[0].prepare];
-        this.fusions[0].start =  [this.taskOptions.start, this.fusions[0].start];
-        this.fusions[0].complete =  [this.taskOptions.complete, this.fusions[0].complete];
-        this.fusions[0].always =  [this.taskOptions.always, this.fusions[0].always];
-        this.fusions[0].fail =  [this.taskOptions.fail, this.fusions[0].fail];
-        this.fusions[0].end =  [this.taskOptions.end, this.fusions[0].end];
-        this.fusions[0].clear =  [this.taskOptions.clear, this.fusions[0].clear];
+        this.shortcuts[0].prepare =  [this.taskOptions.prepare, this.shortcuts[0].prepare];
+        this.shortcuts[0].start =  [this.taskOptions.start, this.shortcuts[0].start];
+        this.shortcuts[0].complete =  [this.taskOptions.complete, this.shortcuts[0].complete];
+        this.shortcuts[0].always =  [this.taskOptions.always, this.shortcuts[0].always];
+        this.shortcuts[0].fail =  [this.taskOptions.fail, this.shortcuts[0].fail];
+        this.shortcuts[0].end =  [this.taskOptions.end, this.shortcuts[0].end];
+        this.shortcuts[0].clear =  [this.taskOptions.clear, this.shortcuts[0].clear];
       }
     }
     else
@@ -52,8 +52,8 @@
         new Task(element, this.taskOptions, this.jobsOptions).start();
       }.bind(this));
     }
-    for(var i = 0;i < this.fusions.length;++i)
-      animate.call(this.elements, this.fusions[i].fusion, this.fusions[i]);
+    for(var i = 0;i < this.shortcuts.length;++i)
+      animate.call(this.elements, this.shortcuts[i].shortcut, this.shortcuts[i]);
   };
 
   Action.prototype.prepare = function() {
@@ -66,20 +66,20 @@
     delete this.taskOptions.end;
     delete this.taskOptions.clear;
     this.jobsOptions = [];
-    this.fusions = [];
+    this.shortcuts = [];
     var custom = this.taskOptions.custom || {};
     for(var i = 0;i < this.animations.length;++i)
     {
       // prepare options
       var animation = this.animations[i];
       var options;
-      if(animation.fusion)
+      if(animation.shortcut)
       {
         options = $.extend({}, this.taskOptions, animation, custom[animation.id]);
         this.taskOptions.combinable = true;
         options.combinable = true;
-        options.fusion = animation.fusion;
-        this.fusions.push(options);
+        options.shortcut = animation.shortcut;
+        this.shortcuts.push(options);
         continue;
       }
       options = $.extend({}, this.taskOptions, custom[animation.id]);
@@ -624,6 +624,11 @@
     wrapper.attr('animation-wrapper', 1);
     if(element.css('float') != 'none')
       wrapper.css('float', element.css('float'));
+    if(element.css('position') != 'static')
+    {
+      wrapper.css('position', element.css('position'));
+      wrapper.css('z-index', element.css('z-index'));
+    }
     element.wrap(wrapper);
     element.attr('animation-display', display);
     return element.parent();

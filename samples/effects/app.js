@@ -106,7 +106,7 @@
         continue;
       var checkbox = $('<input type="checkbox" class="animation-check"/>');
       checkbox.attr('id', key).attr('animation', key);
-      var label = $('<label class="animation input highlight"></lable>');
+      var label = $('<label class="animation input highlight"></label>');
       label.text(key).attr('for', key).click(click);
       $('#animations').append(checkbox).append(label);
       add(key);

@@ -143,7 +143,7 @@ $('#want-to-animate').animate({
 ```
 Sometimes you could combine mutiple animations frequent use to a new one.
 ```JavaScript
-$.animations['hit'] = { fusion: 'fadeOut shake bounce' };
+$.animations['hit'] = { shortcut: 'fadeOut shake bounce' };
 // now you can call the new animation 'hit'
 $('#want-to-animate').animate('hit');
 ```

@@ -1,3 +1,8 @@
+# v0.3.7 / 2014-03-25
+
+* Fix tile plug in wrong size.
+* Change option name fusion to shortcut.
+
 # v0.3.6 / 2014-03-25
 
 * Fix emptyAnimation bug.
