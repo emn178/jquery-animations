@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.3.5
+ * jQuery-animations v0.3.6
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
