@@ -31,26 +31,40 @@
     </div>
     <div id="settings">
       <button id="submit">Animate</button>
+      <div>
+        <h3>Pre-defined Combinations</h3>
+        <button id="assemble" class="predefined">Assemble</button>
+        <button id="blind" class="predefined">Blind</button>
+        <button id="wave" class="predefined">Wave</button>
+        <button id="flutter" class="predefined">Flutter</button>
+        <button id="puzzle" class="predefined">Puzzle</button>
+      </div>
       <div id="animations">
-        <div id="effect">
-          <h3>Effect</h3>
-          <div>
-            <input id="combine" type="checkbox" checked="checked"/>
-            <label for="combine">Combine</label>
+        <input id="show-effect" class="toggle-check" type="checkbox"/>
+        <div id="effect" class="toggle-wrapper">
+          <h3><label class="options-toggle" for="show-effect">Effect</label></h3>
+          <div id="effects" class="toggle-container">
+            <div>
+              <input id="combine" type="checkbox" checked="checked"/>
+              <label for="combine">Combine</label>
+            </div>
           </div>
         </div>
-        <div id="alternate">
-          <h3>Alternate</h3>
-          <div>
-            <input id="combine" type="checkbox" checked="checked"/>
-            <label for="combine">Combine</label>
+        <input id="show-alternate" class="toggle-check" type="checkbox"/>
+        <div id="alternate" class="toggle-wrapper">
+          <h3><label class="options-toggle" for="show-alternate">Alternate</label></h3>
+          <div id="alternates" class="toggle-container">
+            <div>
+              <input id="combine" type="checkbox" checked="checked"/>
+              <label for="combine">Combine</label>
+            </div>
           </div>
         </div>
       </div>
-      <input id="showOptions" name="showOptions" type="checkbox"/>
-      <div id="options">
-        <h3><label id="options-toggle" for="showOptions">Options</label></h3>
-        <div id="options-wrap">
+      <input id="show-options" class="toggle-check" type="checkbox"/>
+      <div id="options" class="toggle-wrapper">
+        <h3><label class="options-toggle" for="show-options">Options</label></h3>
+        <div id="options-wrap" class="toggle-container">
           <div class="option-group global">
             <h5>Global</h5>
             <label for="duration">Duration</label>
@@ -61,13 +75,31 @@
             <input type="number" id="repeat" name="repeat" step="1" min="0" />
             <label for="easing">Easing</label>
             <select id="easing" name="easing">
-              <option value="">Default</option>
+              <option value=""></option>
               <option value="linear">Linear</option>
               <option value="ease">Ease</option>
               <option value="ease-in">Ease In</option>
               <option value="ease-out">Ease Out</option>
               <option value="ease-in-out">Ease In Out</option>
             </select>
+            <label for="direction">Direction</label>
+            <select id="direction" name="direction">
+              <option value=""></option>
+              <option value="normal">Normal</option>
+              <option value="alternate">Alternate</option>
+              <option value="alternate-reverse">Alternate Reverse</option>
+            </select>
+            <label for="fillMode">Fill Mode</label>
+            <select id="fillMode" name="fillMode">
+              <option value=""></option>
+              <option value="forwards">Forwards</option>
+              <option value="backwards">Backwards</option>
+              <option value="both">Both</option>
+            </select>
+            <label for="strength" class="custom">*Strength</label>
+            <input type="number" id="strength" name="strength" step="1" min="0" />
+            <label for="distance" class="custom">*Distance</label>
+            <input type="number" id="distance" name="distance" step="1" min="0" />
             <label for="rows" class="custom">Rows</label>
             <input type="number" id="rows" name="rows" step="1" min="0" />
             <label for="cols" class="custom">Cols</label>
@@ -80,7 +112,7 @@
             <label for="adjustDuration" class="custom">Adjust Duration</label>
             <label for="order" class="custom">Order</label>
             <select id="order" name="order">
-              <option value="">Default</option>
+              <option value=""></option>
               <option value="random">Random</option>
               <option value="randomCols">Random Columns</option>
               <option value="randomRows">Random Rows</option>

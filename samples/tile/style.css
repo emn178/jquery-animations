@@ -116,6 +116,14 @@ input:checked+.animation, .animation:hover, .highlight {
   text-align: center;
 }
 
+.predefined {
+  background-color: transparent;
+  min-width: 80px;
+  height: 65px;
+  font-size: 20px;
+  padding: 20px;
+}
+
 input, button, select, .input {
   margin: 10px;
   outline: none;
@@ -167,21 +175,21 @@ select {
   display: none;
 }
 
-#showOptions {
+.toggle-check {
   display: none;
 }
-#showOptions+#options #options-wrap {
+.toggle-check+.toggle-wrapper .toggle-container {
   display: none;
 }
-#showOptions:checked+#options #options-wrap {
+.toggle-check:checked+.toggle-wrapper .toggle-container {
   display: block;
 }
 
-#options-toggle {
+.options-toggle {
   cursor: pointer;
 }
 
-#options-toggle:before {
+.options-toggle:before {
   content: '';
   width: 0; 
   height: 0; 
@@ -193,7 +201,7 @@ select {
   border-left: 10px solid gray;
 }
 
-#showOptions:checked+#options #options-toggle:before {
+.toggle-check:checked+.toggle-wrapper .options-toggle:before {
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-top: 10px solid gray;

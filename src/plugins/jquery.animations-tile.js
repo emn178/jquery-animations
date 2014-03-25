@@ -2,10 +2,11 @@
   function tile(wrapper, element, rows, cols) {
     var width = element.outerWidth();
     var height = element.outerHeight();
-    var tileWidth = Math.round(width / cols);
-    var tileHeight = Math.round(height / rows);
-    var lastTileWidth = width - tileWidth * (cols - 1);
-    var lastTileHeight = height - tileHeight * (rows - 1);
+    var tileWidth = parseInt(width / cols);
+    var tileHeight = parseInt(height / rows);
+    var remainWidth = width - tileWidth * cols;
+    var remainHeight = height - tileHeight * rows;
+
     var tiles = [];
     var isImg = element[0].tagName == 'IMG';
     if(isImg)
@@ -13,15 +14,20 @@
       var src = element.attr('src');
       element.hide();
     }
+    var offsetY = 0;
     for(var i = 0;i < rows;++i)
     {
       var rowTiles = [];
-      var useHeight = i == rows - 1 ? lastTileHeight : tileHeight;
-      var y = -i * tileHeight;
+      var useHeight = i < remainHeight ? tileHeight + 1 : tileHeight;
+      var y = -offsetY;
+      offsetY += useHeight;
+      var offsetX = 0;
       for(var j = 0;j < cols;++j)
       {
-        var useWidth = j == cols - 1 ? lastTileWidth : tileWidth;
+        var useWidth = j < remainWidth ? tileWidth + 1 : tileWidth;
         var x = -j * tileWidth;
+        var x = -offsetX;
+        offsetX += useWidth;
         if(isImg)
         {
           var tile = $('<span></span>');
@@ -210,14 +216,27 @@
       var cols = validate(options.variables.cols, 1);
       var tiles = tile(options.wrapper, element, rows, cols);
 
-      var subOptions = {};
-      subOptions.duration = options.duration;
-      subOptions.easing = options.easing;
-      subOptions.delay = options.delay;
-      subOptions.direction = options.direction;
-      subOptions.repeat = options.repeat;
-      subOptions.fillMode = options.fillMode;
-      subOptions.timeout = options.timeout;
+      var subOptions = $.extend({}, options);
+      delete subOptions.id;
+      delete subOptions.prepare;
+      delete subOptions.start;
+      delete subOptions.complete;
+      delete subOptions.always;
+      delete subOptions.fail;
+      delete subOptions.end;
+      delete subOptions.clear;
+      delete subOptions.name;
+      delete subOptions.keyframes;
+      delete subOptions.emptyAnimation;
+      delete subOptions.wrap;
+      delete subOptions.combinable;
+      delete subOptions.wrapper;
+      delete subOptions.element;
+      delete subOptions.originalElement;
+      delete subOptions.prepareOptions;
+
+      if(options.variables.ordering)
+        ++subOptions.delay;
 
       var orders = createOrders(rows, cols, options.variables.order);
       var effects = options.variables.effect;
@@ -279,7 +298,7 @@
           {
             cloneOptions.delay += stepDelay;
             if(options.variables.adjustDuration)
-              cloneOptions.duration -= cloneOptions.delay;
+              cloneOptions.duration -= stepDelay;
           }
           tiles[pair[0]][pair[1]].animate(effect, cloneOptions);
         }

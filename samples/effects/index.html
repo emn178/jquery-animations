@@ -51,12 +51,26 @@
             <input type="number" id="repeat" name="repeat" step="1" min="0" />
             <label for="easing">Easing</label>
             <select id="easing" name="easing">
-              <option value="">Default</option>
+              <option value=""></option>
               <option value="linear">Linear</option>
               <option value="ease">Ease</option>
               <option value="ease-in">Ease In</option>
               <option value="ease-out">Ease Out</option>
               <option value="ease-in-out">Ease In Out</option>
+            </select>
+            <label for="direction">Direction</label>
+            <select id="direction" name="direction">
+              <option value=""></option>
+              <option value="normal">Normal</option>
+              <option value="alternate">Alternate</option>
+              <option value="alternate-reverse">Alternate Reverse</option>
+            </select>
+            <label for="fillMode">Fill Mode</label>
+            <select id="fillMode" name="fillMode">
+              <option value=""></option>
+              <option value="forwards">Forwards</option>
+              <option value="backwards">Backwards</option>
+              <option value="both">Both</option>
             </select>
             <label for="strength" class="custom">*Strength</label>
             <input type="number" id="strength" name="strength" step="1" min="0" />

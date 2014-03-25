@@ -6,6 +6,10 @@
 
   function animate()
   {
+    if($.isEmptyObject(options))
+      $('#code').text("$('#image').animate('" + animation + "');");
+    else
+      $('#code').text("$('#image').animate('" + animation + "', " + JSON.stringify(options, null, 2) +  ");");
     $('#image').animate(animation, options);
   }
 
@@ -72,7 +76,7 @@
   {
     var checkbox = $('<input type="checkbox" class="animation-check"/>');
     checkbox.attr('id', container + key).attr('animation', key);
-    var label = $('<label class="animation input"></lable>');
+    var label = $('<label class="animation input"></label>');
     label.text(key).attr('for', container + key).click(click);
     $('#' + container).append(checkbox).append(label);
   }
@@ -82,8 +86,8 @@
     {
       if(key == 'fn' || key == 'tile')
         continue;
-      addButton(key, 'effect');
-      addButton(key, 'alternate');
+      addButton(key, 'effects');
+      addButton(key, 'alternates');
       // add(key);
     }
 
@@ -92,19 +96,75 @@
 
     var img = $('#image')[0];
     if(img.complete || img.readyState === 4)
-      splash();
+      assemble();
     else
-      $('#image').bind('load', splash);
+      $('#image').bind('load', assemble);
+
+    $('#assemble').click(assemble);
+    $('#blind').click(blind);
+    $('#wave').click(wave);
+    $('#flutter').click(flutter);
+    $('#puzzle').click(puzzle);
   });
 
-  function splash()
-  {
-    $('#image').animate('tile', {
-      duration: 2500,
+  function assemble() {
+    options = {
+      duration: 2000,
       rows: 12,
       cols: 8,
       effect: 'flyIn',
       fillMode: 'backwards'
-    });
+    }
+    animate();
+  }
+
+  function blind() {
+    options = {
+      duration: 2000,
+      rows: 50,
+      ordering: false,
+      effect: 'slideFromDown'
+    };
+    animate();
+  }
+
+  function wave() {
+    options = {
+      duration: 2000,
+      rows: 200,
+      effect: 'shake',
+      cycle: 50,
+      order: 'tb',
+      adjustDuration: false
+    };
+    animate();
+  }
+
+  function flutter() {
+    options = {
+      duration: 2000,
+      cols: 200,
+      effect: 'bounce',
+      order: 'lr'
+    };
+    animate();
+  }
+
+  function puzzle() {
+    options = {
+      duration: 2000,
+      rows: 9,
+      cols: 9,
+      effect: [
+        'slideFromDown',
+        'slideFromRight',
+        'slideFromUp',
+        'slideFromLeft'
+      ],
+      order: 'lrtb',
+      ordering: false,
+      adjustDuration: true
+    };
+    animate();
   }
 })(jQuery, window, document);
