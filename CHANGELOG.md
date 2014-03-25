@@ -1,3 +1,8 @@
+# v0.3.4 / 2014-03-25
+
+* Add order functions to tile plugin.
+* Change effect alternate to effects array.
+
 # v0.3.3 / 2014-03-24
 
 * Rename events and attributes inside.

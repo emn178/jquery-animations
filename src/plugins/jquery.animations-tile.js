@@ -75,6 +75,110 @@
     return defaultValue;
   }
 
+  function shuffle(array)
+  {
+    for(var i = 0;i < array.length;++i)
+    {
+      var r = parseInt(Math.random() * array.length);
+      var tmp = array[i];
+      array[i] = array[r];
+      array[r] = tmp;
+    }
+    return array;
+  }
+
+  function createOrders(rows, cols, method)
+  {
+    if($.isArray(method))
+      return method;
+    if(!orderMethods[method])
+      method = shuffle(methodNames)[0];
+    return orderMethods[method](rows, cols);
+  }
+
+  var orderMethods = {
+    lr: function(rows, cols) {
+      var orders = [];
+      for(var j = 0;j < cols;++j)
+      {
+        var step = [];
+        for(var i = 0;i < rows;++i)
+          step.push([i, j]);
+        orders.push(step);
+      }
+      return orders;
+    },
+    rl: function(rows, cols) {
+      return orderMethods.lr(rows, cols).reverse();
+    },
+    tb: function(rows, cols) {
+      var orders = [];
+      for(var i = 0;i < rows;++i)
+      {
+        var step = [];
+        for(var j = 0;j < cols;++j)
+          step.push([i, j]);
+        orders.push(step);
+      }
+      return orders;
+    },
+    bt: function(rows, cols) {
+      return orderMethods.tb(rows, cols).reverse();
+    },
+    lrtb: function(rows, cols) {
+      var orders = [];
+      for(var i = 0;i < rows;++i)
+        for(var j = 0;j < cols;++j)
+          orders.push([[i, j]]);
+      return orders;
+    },
+    rlbt: function(rows, cols) {
+      return orderMethods.lrtb(rows, cols).reverse();
+    },
+    rltb: function(rows, cols) {
+      var orders = [];
+      for(var i = 0;i < rows;++i)
+        for(var j = cols - 1;j >= 0;--j)
+          orders.push([[i, j]]);
+      return orders;
+    },
+    lrbt: function(rows, cols) {
+      return orderMethods.rltb(rows, cols).reverse();
+    },
+    tblr: function(rows, cols) {
+      var orders = [];
+      for(var j = 0;j < cols;++j)
+        for(var i = 0;i < rows;++i)
+          orders.push([[i, j]]);
+      return orders;
+    },
+    btrl: function(rows, cols) {
+      return orderMethods.tblr(rows, cols).reverse();
+    },
+    tbrl: function(rows, cols) {
+      var orders = [];
+      for(var j = cols - 1;j >= 0;--j)
+        for(var i = 0;i < rows;++i)
+          orders.push([[i, j]]);
+      return orders;
+    },
+    btlr: function(rows, cols) {
+      return orderMethods.tbrl(rows, cols).reverse();
+    },
+    random: function(rows, cols) {
+      return shuffle(orderMethods.lrtb(rows, cols))
+    },
+    randomCols: function(rows, cols) {
+      return shuffle(orderMethods.lr(rows, cols))
+    },
+    randomRows: function(rows, cols) {
+      return shuffle(orderMethods.tb(rows, cols))
+    }
+  };
+  var methodNames = [];
+  for(var key in orderMethods)
+    methodNames.push(key);
+
   var animation = {
     duration: 1000,
     emptyAnimation: true,
@@ -83,9 +187,8 @@
       rows: 1,
       cols: 1,
       effect: 'flyOut',
-      alternate: null,
       ordering: true,
-      order: 'lrtb',
+      order: null,
       cycle: null,
       adjustDuration: true
     },
@@ -117,60 +220,38 @@
       subOptions.timeout = options.timeout;
       subOptions.noClear = true;
 
-      var tilesCount = rows * cols;
-      var delay = subOptions.duration / tilesCount;
-      var alternate = options.variables.alternate || options.variables.effect;
-      var cycle = validate(options.variables.cycle, tilesCount);
-      var leftToRight = true;
-      var topToBottom = true;
-      switch(options.variables.order)
+      var effects = options.variables.effect;
+      if(!$.isArray(effects))
+        effects = [effects];
+      var orders = createOrders(rows, cols, options.variables.order);
+      var steps = orders.length;
+      var delay = subOptions.duration / steps;
+      var cycle = validate(options.variables.cycle, steps);
+      for(var i = 0;i < orders.length;++i)
       {
-        case 'rl':
-        case 'rltb':
-        case 'tbrl':
-          leftToRight = false;
-          break;
-        case 'bt':
-        case 'lrbt':
-        case 'btlr':
-          topToBottom = false;
-          break;
-        case 'btrl':
-        case 'rlbt':
-          leftToRight = false;
-          topToBottom = false;
-          break;
-        case 'lrtb':
-        default:
-          break;
-      }
-
-      if(!topToBottom)
-        tiles = tiles.reverse();
-
-      for(var i = 0;i < rows;++i)
-      {
-        var rowTiles = tiles[i];
-        if(!leftToRight)
-          rowTiles = rowTiles.reverse();
-        for(var j = 0;j < cols;++j)
+        var step = orders[i];
+        if(options.variables.ordering)
         {
+          var count = i;
+          if(parseInt(count / cycle) % 2 == 0)
+            count = count % cycle;
+          else
+            count = cycle - (count % cycle);
+          var stepDelay = delay * count;
+        }
+        for(var j = 0;j < step.length;++j)
+        {
+          var pair = step[j];
           var cloneOptions = $.extend({}, subOptions);
           if(options.variables.ordering)
           {
-            var count = (j + i * cols);
-            if(parseInt(count / cycle) % 2 == 0)
-              count = count % cycle;
-            else
-              count = cycle - (count % cycle);
-            cloneOptions.delay += delay * count;
+            cloneOptions.delay += stepDelay;
             if(options.variables.adjustDuration)
               cloneOptions.duration -= cloneOptions.delay;
           }
-          if((j % 2) ^ (i % 2))
-            rowTiles[j].animate(options.variables.effect, cloneOptions);
-          else
-            rowTiles[j].animate(alternate, cloneOptions);
+          var n = i * step.length + j;
+          var effect = effects[n % effects.length];
+          tiles[pair[0]][pair[1]].animate(effect, cloneOptions);
         }
       }
     },
