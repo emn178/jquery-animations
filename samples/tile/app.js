@@ -27,11 +27,14 @@
     })).join(' ');
     if(!options.effect)
       delete options.effect;
-    options.alternate = $.makeArray($('#alternate .animation-check:checked').map(function() {
+    var alternate = $.makeArray($('#alternate .animation-check:checked').map(function() {
       return $(this).attr('animation');
     })).join(' ');
-    if(!options.alternate)
-      delete options.alternate;
+    if(alternate)
+      if(options.effect)
+        options.effect = [options.effect, alternate];
+      else
+        options.effect = alternate;
     $('.option-group select, .option-group input').each(function() {
       var element = $(this);
       var name = element.attr('name');
@@ -101,7 +104,6 @@
       rows: 12,
       cols: 8,
       effect: 'flyIn',
-      order: 'random',
       fillMode: 'backwards'
     });
   }
