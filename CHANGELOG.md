@@ -1,3 +1,9 @@
+# v0.3.5 / 2014-03-25
+
+* Add autoWrap option.
+* Add custom effect to tile plugin.
+* Fix slide plugin bug.
+
 # v0.3.4 / 2014-03-25
 
 * Add order functions to tile plugin.

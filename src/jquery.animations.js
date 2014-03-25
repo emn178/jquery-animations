@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.3.4
+ * jQuery-animations v0.3.5
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -119,6 +119,8 @@
     this.taskOptions.fail = this.options.fail;
     this.taskOptions.end = this.options.end;
     this.taskOptions.clear = this.options.clear;
+    if(this.taskOptions.autoWrap === undefined)
+      this.taskOptions.autoWrap = true;
   };
 
   function Task(element, options, jobsOptions)
@@ -160,6 +162,10 @@
     this.jobsOptions.sort(function(a, b) {
       return a.wrap ? -1 : (b.wrap ? 1 : 0);
     });
+
+    if(!this.options.autoWrap)
+      this.combineOptions();
+
     for(var i = 0;i < this.jobsOptions.length;++i)
     {
       var options = $.extend({}, this.jobsOptions[i]);
@@ -170,15 +176,20 @@
       if(options.wrap)
         options.wrapper = wrap(this.actor);
 
-      callback(options.prepare, this.actor[0], [options]);
-      if(options.keyframes)
+      var preparesOptions = options.combinedJobs || [options];
+      for(var j = 0;j < preparesOptions.length;++j)
       {
-        options.name = 'a' + ++id;
-        css += generateKeyframeCss({
-          name: options.name,
-          keyframes: options.keyframes,
-          variables: options.variables
-        });
+        var prepareOptions = preparesOptions[j];
+        callback(prepareOptions.prepare, this.actor[0], [prepareOptions]);
+        if(prepareOptions.keyframes)
+        {
+          prepareOptions.name = 'a' + ++id;
+          css += generateKeyframeCss({
+            name: prepareOptions.name,
+            keyframes: prepareOptions.keyframes,
+            variables: prepareOptions.variables
+          });
+        }
       }
 
       options.start = [options.start, this.onstart.bind(this)];
@@ -228,6 +239,26 @@
       return;
     this.element.trigger('animationcancel');
     this.element.attr('animation-combinable', 1);
+  };
+
+  Task.prototype.combineOptions = function() {
+    var newJobsOptions = [];
+    var combinedOptions = [];
+    for(var i = 0;i < this.jobsOptions.length;++i)
+    {
+      var jobOptions = this.jobsOptions[i];
+      if(isCombiableOptions(jobOptions))
+        combinedOptions.push(jobOptions);
+      else
+        newJobsOptions.push(jobOptions);
+    }
+    if(combinedOptions.length > 0)
+    {
+      var first = combinedOptions[0];
+      first.combinedJobs = combinedOptions;
+      newJobsOptions.push(first);
+    }
+    this.jobsOptions = newJobsOptions;
   };
 
   Task.prototype.onstart = function() {
@@ -338,6 +369,12 @@
     this.element = $(element);
     this.options = options;
     this.prepare();
+    this.counter = {
+      complete: 0,
+      fail: 0,
+      always: 0,
+      start: 0
+    };
   }
 
   Job.prototype.start = function() {
@@ -369,33 +406,51 @@
       element.removeAttr('animation-prepare');
       this.onend = this.onend.bind(this);
       element.on(animationend, this.onend);
-      observe(element, new Date().getTime() + options.delay + options.timeout);
+      for(var i = 0;i < this.preparesOptions.length;++i)
+        observe(element, new Date().getTime() + this.preparesOptions[i].delay + this.preparesOptions[i].timeout);
     }
   };
 
   Job.prototype.prepare = function() {
-    var options = this.options;
-    var element = this.element;
-    var properties = [
-      options.name, 
-      options.duration / 1000 + 's', 
-      options.easing, 
-      options.delay / 1000 + 's', 
-      options.repeat, 
-      options.direction,
-      options.fillMode,
-    ].join(' ');
-    element.attr('animation-prepare', properties);
+    var preparesOptions = this.options.combinedJobs || [this.options];
+    var properties = [];
+    for(var i = 0;i < preparesOptions.length;++i)
+    {
+      var options = preparesOptions[i];
+      properties.push([
+        options.name, 
+        options.duration / 1000 + 's', 
+        options.easing, 
+        options.delay / 1000 + 's', 
+        options.repeat, 
+        options.direction,
+        options.fillMode,
+      ].join(' '));
+    }
+    this.combinedCount = preparesOptions.length;
+    this.preparesOptions = preparesOptions;
+    this.element.attr('animation-prepare', properties.join(','));
   };
 
   Job.prototype.onstart = function(e) {
-    unobserve(this.element);
+    e.stopPropagation();
+    ++this.counter.start;
+    if(this.combinedCount == this.counter.start)
+      unobserve(this.element);
     callback(this.options.start, this.element[0], [this.options]);
   };
 
   Job.prototype.onfail = function(e) {
     e.stopPropagation();
-    this.finish(false);
+    ++this.counter.always;
+    ++this.counter.fail;
+    if(this.combinedCount == this.counter.always)
+    {
+      if(this.counter.fail == this.counter.always)
+        this.finish(false);
+      else
+        this.finish(true);
+    }
   };
 
   Job.prototype.oncancel = function(e) {
@@ -404,7 +459,10 @@
 
   Job.prototype.onend = function(e) {
     e.stopPropagation();
-    this.finish(true);
+    ++this.counter.always;
+    ++this.counter.complete;
+    if(this.combinedCount == this.counter.always)
+      this.finish(true);
   };
 
   Job.prototype.onfinish = function(e) {
@@ -472,20 +530,32 @@
       var deadline = observation.attr('animation-deadline');
       if(!deadline)
         continue;
-      deadline = parseInt(deadline);
-      if(now > deadline)
+      var deadlines = deadline.split(',');
+      var result = [];
+      for(var j = 0;j < deadlines.length;++j)
       {
-        observation.removeAttr('animation-deadline');
-        observation.trigger('animationfail');
+        deadline = parseInt(deadlines[j]);
+        if(now > deadline)
+          observation.trigger('animationfail');
+        else
+          result.push(deadline);
       }
+      if(result.length == 0)
+        observation.removeAttr('animation-deadline');
       else
+      {
+        observation.attr('animation-deadline', result.join(','));
         remains.push(observation);
+      }
     }
     observations = remains;
   }
 
   function observe(element, deadline)
   {
+    var pre = element.attr('animation-deadline');
+    if(pre)
+      deadline = pre + ',' + deadline;
     element.attr('animation-deadline', deadline);
     observations.push(element);
   }
@@ -493,6 +563,28 @@
   function unobserve(element)
   {
     element.removeAttr('animation-deadline');
+  }
+
+  function isCombiableOptions(options)
+  {
+    return !options.wrap
+      && isEmptyCallbacks(options.start)
+      && isEmptyCallbacks(options.complete)
+      && isEmptyCallbacks(options.always)
+      && isEmptyCallbacks(options.fail)
+      && isEmptyCallbacks(options.end)
+      && isEmptyCallbacks(options.clear);
+  }
+
+  function isEmptyCallbacks(callbacks)
+  {
+    if(!$.isArray(callbacks))
+      return !$.isFunction(callbacks);
+    
+    for(var i = 0;i < callbacks.length;++i)
+      if(!isEmptyCallbacks(callbacks[i]))
+        return false;
+    return true;
   }
 
   function callback(callbacks, thisArg, argsArray) 
@@ -514,6 +606,8 @@
     var display = element.attr('animation-display') || element.css('display');
     if(display == 'block')
       wrapper.css('display', 'block');
+    else if(display == 'none')
+      wrapper.css('display', 'none');
     else if(supportFlex)
       wrapper.css('display', 'inline-flex');
     else
@@ -528,6 +622,7 @@
 
   function saveStyle(element, properties)
   {
+    element = $(element)[0];
     var style = {};
     for(var i = 0;i < properties.length;++i)
       style[properties[i]] = element.style[properties[i]];
@@ -536,6 +631,7 @@
 
   function restoreStyle(element, style)
   {
+    element = $(element)[0];
     for(var propertyName in style)
       element.style[propertyName] = style[propertyName];
   }

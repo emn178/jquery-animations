@@ -65,6 +65,9 @@ Sets the flag determining the animation combines with other animations. It will 
 ###### *wrap: `Boolean` (default: `false`)*
 Sets the flag determining the animations applies to a new wrapper.
 
+###### *autoWrap: `Boolean` (default: `true`)*
+Sets the flag determining the animations applies to a new wrapper when combine other animations automatically. You can disable this flag if the animations are simple without conflicts for better performace. eg. fadeOut and shake can apply in the same element easily, but shake and bounce use the same css property and conflict.
+
 ###### *prepare: `Function(options)`*
 Sets the callback function to call once animations are ready to begin.
 
@@ -167,6 +170,12 @@ $('#want-to-animate').animate('animation1 animation2', {
 
   // Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.
   combinable: false,
+
+  // Sets the flag determining the animations applies to a new wrapper.
+  wrap: false,
+
+  // Sets the flag determining the animations applies to a new wrapper when combine other animations automatically. You can disable this flag if the animations are simple without conflicts for better performace. eg. fadeOut and shake can apply in the same element easily, but shake and bounce use the same css property and conflict.
+  autoWrap: true,
 
   // Sets the callback function to call once animations are ready to begin.
   prepare: function() { },

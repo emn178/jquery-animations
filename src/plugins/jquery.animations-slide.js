@@ -13,7 +13,7 @@
     },
     prepare: function(options) {
       var element = $(this);
-      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom']);
+      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height']);
       var w = element.outerWidth();
       var h = element.outerHeight();
       options.wrapper.css({
@@ -25,7 +25,11 @@
         'height': h + 'px',
         'overflow': 'hidden'
       });
-      element.css('margin', '0');
+      element.css({
+        width: w + 'px',
+        height: h + 'px',
+        margin: '0'
+      });
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))

@@ -218,12 +218,40 @@
       subOptions.repeat = options.repeat;
       subOptions.fillMode = options.fillMode;
       subOptions.timeout = options.timeout;
-      subOptions.noClear = true;
 
+      var orders = createOrders(rows, cols, options.variables.order);
       var effects = options.variables.effect;
+      if($.isFunction(effects))
+      {
+        for(var i = 0;i < orders.length;++i)
+        {
+          var step = orders[i];
+          for(var j = 0;j < step.length;++j)
+          {
+            var pair = step[j];
+            var row = pair[0];
+            var col = pair[1];
+            var cloneOptions = $.extend({}, subOptions);
+            var effect = effects.call(this, cloneOptions, row, col);
+            cloneOptions.noClear = true;
+            tiles[row][col].animate(effect, cloneOptions);
+          }
+        }
+        return;
+      }
+
       if(!$.isArray(effects))
         effects = [effects];
-      var orders = createOrders(rows, cols, options.variables.order);
+      var effectsOptions = [];
+      for(var i = 0;i < effects.length;++i)
+      {
+        var effect = effects[i];
+        if(typeof(effect) != 'object')
+          effect = {effect: effect};
+        effect = $.extend({}, subOptions, effect);
+        effect.noClear = true;
+        effectsOptions.push(effect);
+      }
       var steps = orders.length;
       var delay = subOptions.duration / steps;
       var cycle = validate(options.variables.cycle, steps);
@@ -242,15 +270,17 @@
         for(var j = 0;j < step.length;++j)
         {
           var pair = step[j];
-          var cloneOptions = $.extend({}, subOptions);
+          var n = i * step.length + j;
+          var effectOptions = effectsOptions[n % effectsOptions.length];
+          var cloneOptions = $.extend({}, effectOptions);
+          var effect = cloneOptions.effect;
+          delete cloneOptions.effect;
           if(options.variables.ordering)
           {
             cloneOptions.delay += stepDelay;
             if(options.variables.adjustDuration)
               cloneOptions.duration -= cloneOptions.delay;
           }
-          var n = i * step.length + j;
-          var effect = effects[n % effects.length];
           tiles[pair[0]][pair[1]].animate(effect, cloneOptions);
         }
       }
