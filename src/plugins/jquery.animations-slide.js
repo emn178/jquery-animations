@@ -7,16 +7,16 @@
   var animation = {
     duration: 1000,
     keyframes: keyframes,
+    wrap: true,
     variables: {
       distance: null
     },
     prepare: function(options) {
       var element = $(this);
-      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom']);
+      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height']);
       var w = element.outerWidth();
       var h = element.outerHeight();
-      var wrapper = $.wrap(element);
-      wrapper.css({
+      options.wrapper.css({
         'margin-left': element.css('margin-left'),
         'margin-right': element.css('margin-right'),
         'margin-top': element.css('margin-top'),
@@ -25,7 +25,11 @@
         'height': h + 'px',
         'overflow': 'hidden'
       });
-      element.css('margin', '0');
+      element.css({
+        width: w + 'px',
+        height: h + 'px',
+        margin: '0'
+      });
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
