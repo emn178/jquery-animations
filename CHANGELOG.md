@@ -1,3 +1,8 @@
+# v0.3.6 / 2014-03-25
+
+* Fix emptyAnimation bug.
+* Change tile plugin random method.
+
 # v0.3.5 / 2014-03-25
 
 * Add autoWrap option.

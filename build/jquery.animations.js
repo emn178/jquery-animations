@@ -391,13 +391,17 @@
     element.on('animationfinish', this.onfinish);
     if(options.emptyAnimation)
     {
-      this.startTimer = setTimeout(this.onstart, options.delay);
-      var repeat = parseInt(options.repeat);
-      if(!isNaN(repeat))
+      for(var i = 0;i < this.preparesOptions.length;++i)
       {
-        this.endTimer = setTimeout(function() {
-          this.finish(true);
-        }.bind(this), options.delay + options.duration * repeat);
+        var prepareOptions = this.preparesOptions[i];
+        this.startTimer = setTimeout(this.execStart.bind(this), prepareOptions.delay);
+        var repeat = parseInt(prepareOptions.repeat);
+        if(!isNaN(repeat))
+        {
+          this.endTimer = setTimeout(function() {
+            this.finish(true);
+          }.bind(this), prepareOptions.delay + prepareOptions.duration * repeat);
+        }
       }
     }
     else
@@ -434,6 +438,10 @@
 
   Job.prototype.onstart = function(e) {
     e.stopPropagation();
+    this.execStart();
+  };
+
+  Job.prototype.execStart = function() {
     ++this.counter.start;
     if(this.combinedCount == this.counter.start)
       unobserve(this.element);
@@ -568,6 +576,7 @@
   function isCombiableOptions(options)
   {
     return !options.wrap
+      && !options.emptyAnimation
       && isEmptyCallbacks(options.start)
       && isEmptyCallbacks(options.complete)
       && isEmptyCallbacks(options.always)
@@ -1018,7 +1027,7 @@
     if($.isArray(method))
       return method;
     if(!orderMethods[method])
-      method = shuffle(methodNames)[0];
+      method = methodNames[parseInt(Math.random() * methodNames.length)];
     return orderMethods[method](rows, cols);
   }
 

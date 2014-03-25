@@ -92,7 +92,7 @@
     if($.isArray(method))
       return method;
     if(!orderMethods[method])
-      method = shuffle(methodNames)[0];
+      method = methodNames[parseInt(Math.random() * methodNames.length)];
     return orderMethods[method](rows, cols);
   }
 
