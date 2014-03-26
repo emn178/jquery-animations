@@ -1,3 +1,10 @@
+# v0.3.8 / 2014-03-26
+
+* Fix non-static position issue.
+* Update wrap method.
+* Change option name from ordering to sequent of tile plugin.
+* Change option name from order to sequence of tile plugin.
+
 # v0.3.7 / 2014-03-25
 
 * Fix tile plug in wrong size.

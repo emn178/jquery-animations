@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.3.7
+ * jQuery-animations v0.3.8
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -146,6 +146,7 @@
     if(!tasks)
       this.cleaner = true;
     ++tasks;
+    this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position']);
     this.element.attr('animation-tasks', tasks);
     this.ontasksend = this.ontasksend.bind(this);
     this.onstart = this.onstart.bind(this);
@@ -362,6 +363,7 @@
         inner = inner.parent();
       wrapper.replaceWith(inner);
     }
+    $.restoreStyle(this.element, this.styleState);
   };
 
   function Job(element, options)
@@ -613,24 +615,50 @@
   {
     var wrapper = $('<span></span>');
     var display = element.attr('animation-display') || element.css('display');
-    if(display == 'block')
-      wrapper.css('display', 'block');
-    else if(display == 'none')
-      wrapper.css('display', 'none');
-    else if(supportFlex)
-      wrapper.css('display', 'inline-flex');
-    else
-      wrapper.css('display', 'inline-block');
+    element.attr('animation-display', display);
+    
+    if(display == 'inline')
+    {
+      if(supportFlex)
+        display = 'inline-flex';
+      else
+        display = 'inline-block';
+    }
+    wrapper.css('display', display);
+
     wrapper.attr('animation-wrapper', 1);
     if(element.css('float') != 'none')
       wrapper.css('float', element.css('float'));
+
+    var w = element.outerWidth();
+    var h = element.outerHeight();
+
+    wrapper.css({
+      'margin-left': element.css('margin-left'),
+      'margin-right': element.css('margin-right'),
+      'margin-top': element.css('margin-top'),
+      'margin-bottom': element.css('margin-bottom'),
+      'width': w + 'px',
+      'height': h + 'px'
+    });
+    element.css({
+      width: w + 'px',
+      height: h + 'px',
+      margin: '0'
+    });
+
     if(element.css('position') != 'static')
     {
       wrapper.css('position', element.css('position'));
       wrapper.css('z-index', element.css('z-index'));
+      wrapper.css('left', element.css('left'));
+      wrapper.css('right', element.css('right'));
+      wrapper.css('top', element.css('top'));
+      wrapper.css('bottom', element.css('bottom'));
+      element.css('position', 'static');
     }
+
     element.wrap(wrapper);
-    element.attr('animation-display', display);
     return element.parent();
   }
 
@@ -884,23 +912,9 @@
     },
     prepare: function(options) {
       var element = $(this);
-      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height']);
       var w = element.outerWidth();
       var h = element.outerHeight();
-      options.wrapper.css({
-        'margin-left': element.css('margin-left'),
-        'margin-right': element.css('margin-right'),
-        'margin-top': element.css('margin-top'),
-        'margin-bottom': element.css('margin-bottom'),
-        'width': w + 'px',
-        'height': h + 'px',
-        'overflow': 'hidden'
-      });
-      element.css({
-        width: w + 'px',
-        height: h + 'px',
-        margin: '0'
-      });
+      options.wrapper.css('overflow', 'hidden');
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
@@ -925,9 +939,6 @@
           options.variables.distance = distance || w;
           break;
       }
-    },
-    clear: function(options) {
-      $.restoreStyle(this, options.save);
     }
   };
 
@@ -1005,12 +1016,8 @@
       }
       tiles.push(rowTiles);
     }
-    var display = wrapper.css('display') == 'block' ? 'block' : 'inline-block';
-    wrapper.css({
-      width: width,
-      height: height,
-      display: display
-    });
+    if(wrapper.css('display') == 'inline-flex')
+      wrapper.css('display', 'inline-block');
     return tiles;
   }
 
@@ -1033,158 +1040,130 @@
     return array;
   }
 
-  function createOrders(rows, cols, method)
+  function createSequences(rows, cols, method)
   {
     if($.isArray(method))
       return method;
-    if(!orderMethods[method])
-      method = methodNames[parseInt(Math.random() * methodNames.length)];
-    return orderMethods[method](rows, cols);
+    return sequenceMethods[method || 'random'](rows, cols);
   }
 
-  var orderMethods = {
+  var sequenceMethods = {
     lr: function(rows, cols) {
-      var orders = [];
+      var sequences = [];
       for(var j = 0;j < cols;++j)
       {
         var step = [];
         for(var i = 0;i < rows;++i)
           step.push([i, j]);
-        orders.push(step);
+        sequences.push(step);
       }
-      return orders;
+      return sequences;
     },
     rl: function(rows, cols) {
-      return orderMethods.lr(rows, cols).reverse();
+      return sequenceMethods.lr(rows, cols).reverse();
     },
     tb: function(rows, cols) {
-      var orders = [];
+      var sequences = [];
       for(var i = 0;i < rows;++i)
       {
         var step = [];
         for(var j = 0;j < cols;++j)
           step.push([i, j]);
-        orders.push(step);
+        sequences.push(step);
       }
-      return orders;
+      return sequences;
     },
     bt: function(rows, cols) {
-      return orderMethods.tb(rows, cols).reverse();
+      return sequenceMethods.tb(rows, cols).reverse();
     },
     lrtb: function(rows, cols) {
-      var orders = [];
+      var sequences = [];
       for(var i = 0;i < rows;++i)
         for(var j = 0;j < cols;++j)
-          orders.push([[i, j]]);
-      return orders;
+          sequences.push([[i, j]]);
+      return sequences;
     },
     rlbt: function(rows, cols) {
-      return orderMethods.lrtb(rows, cols).reverse();
+      return sequenceMethods.lrtb(rows, cols).reverse();
     },
     rltb: function(rows, cols) {
-      var orders = [];
+      var sequences = [];
       for(var i = 0;i < rows;++i)
         for(var j = cols - 1;j >= 0;--j)
-          orders.push([[i, j]]);
-      return orders;
+          sequences.push([[i, j]]);
+      return sequences;
     },
     lrbt: function(rows, cols) {
-      return orderMethods.rltb(rows, cols).reverse();
+      return sequenceMethods.rltb(rows, cols).reverse();
     },
     tblr: function(rows, cols) {
-      var orders = [];
+      var sequences = [];
       for(var j = 0;j < cols;++j)
         for(var i = 0;i < rows;++i)
-          orders.push([[i, j]]);
-      return orders;
+          sequences.push([[i, j]]);
+      return sequences;
     },
     btrl: function(rows, cols) {
-      return orderMethods.tblr(rows, cols).reverse();
+      return sequenceMethods.tblr(rows, cols).reverse();
     },
     tbrl: function(rows, cols) {
-      var orders = [];
+      var sequences = [];
       for(var j = cols - 1;j >= 0;--j)
         for(var i = 0;i < rows;++i)
-          orders.push([[i, j]]);
-      return orders;
+          sequences.push([[i, j]]);
+      return sequences;
     },
     btlr: function(rows, cols) {
-      return orderMethods.tbrl(rows, cols).reverse();
+      return sequenceMethods.tbrl(rows, cols).reverse();
     },
     random: function(rows, cols) {
-      return shuffle(orderMethods.lrtb(rows, cols))
+      return shuffle(sequenceMethods.lrtb(rows, cols))
     },
     randomCols: function(rows, cols) {
-      return shuffle(orderMethods.lr(rows, cols))
+      return shuffle(sequenceMethods.lr(rows, cols))
     },
     randomRows: function(rows, cols) {
-      return shuffle(orderMethods.tb(rows, cols))
+      return shuffle(sequenceMethods.tb(rows, cols))
     }
   };
-  var methodNames = [];
-  for(var key in orderMethods)
-    methodNames.push(key);
 
+  var exclusions = ['id', 'prepare', 'start', 'complete', 'always', 'fail', 'end', 'clear', 'name', 'keyframes', 'emptyAnimation', 'wrap', 'combinable', 'wrapper', 'element', 'originalElement', 'prepareOptions'];
   var animation = {
-    duration: 1000,
+    duration: 2000,
     emptyAnimation: true,
     wrap: true,
     variables: {
       rows: 1,
       cols: 1,
       effect: 'flyOut',
-      ordering: true,
-      order: null,
+      sequent: true,
+      sequence: null,
       cycle: null,
       adjustDuration: true
     },
     prepare: function(options) {
       var element = $(this);
-      options.save = $.saveStyle(this, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display']);
-      options.wrapper.css({
-        'margin-left': element.css('margin-left'),
-        'margin-right': element.css('margin-right'),
-        'margin-top': element.css('margin-top'),
-        'margin-bottom': element.css('margin-bottom')
-      });
-      element.css({
-        width: element.outerWidth() + 'px',
-        height: element.outerHeight() + 'px',
-        margin: '0'
-      });
       var rows = validate(options.variables.rows, 1);
       var cols = validate(options.variables.cols, 1);
       var tiles = tile(options.wrapper, element, rows, cols);
 
       var subOptions = $.extend({}, options);
-      delete subOptions.id;
-      delete subOptions.prepare;
-      delete subOptions.start;
-      delete subOptions.complete;
-      delete subOptions.always;
-      delete subOptions.fail;
-      delete subOptions.end;
-      delete subOptions.clear;
-      delete subOptions.name;
-      delete subOptions.keyframes;
-      delete subOptions.emptyAnimation;
-      delete subOptions.wrap;
-      delete subOptions.combinable;
-      delete subOptions.wrapper;
-      delete subOptions.element;
-      delete subOptions.originalElement;
-      delete subOptions.prepareOptions;
+      exclusions.forEach(function(key) {
+        delete subOptions[key];
+      });
+      if(options.variables.adjustDuration)
+        subOptions.duration /= 2;
 
-      if(options.variables.ordering)
-        ++subOptions.delay;
+      if(options.variables.sequent && subOptions.delay == 0)
+        subOptions.delay = 1;
 
-      var orders = createOrders(rows, cols, options.variables.order);
+      var sequences = createSequences(rows, cols, options.variables.sequence);
       var effects = options.variables.effect;
       if($.isFunction(effects))
       {
-        for(var i = 0;i < orders.length;++i)
+        for(var i = 0;i < sequences.length;++i)
         {
-          var step = orders[i];
+          var step = sequences[i];
           for(var j = 0;j < step.length;++j)
           {
             var pair = step[j];
@@ -1211,13 +1190,13 @@
         effect.noClear = true;
         effectsOptions.push(effect);
       }
-      var steps = orders.length;
+      var steps = sequences.length;
       var delay = subOptions.duration / steps;
       var cycle = validate(options.variables.cycle, steps);
-      for(var i = 0;i < orders.length;++i)
+      for(var i = 0;i < sequences.length;++i)
       {
-        var step = orders[i];
-        if(options.variables.ordering)
+        var step = sequences[i];
+        if(options.variables.sequent)
         {
           var count = i;
           if(parseInt(count / cycle) % 2 == 0)
@@ -1234,18 +1213,11 @@
           var cloneOptions = $.extend({}, effectOptions);
           var effect = cloneOptions.effect;
           delete cloneOptions.effect;
-          if(options.variables.ordering)
-          {
+          if(options.variables.sequent)
             cloneOptions.delay += stepDelay;
-            if(options.variables.adjustDuration)
-              cloneOptions.duration -= stepDelay;
-          }
           tiles[pair[0]][pair[1]].animate(effect, cloneOptions);
         }
       }
-    },
-    clear: function(options) {
-      $.restoreStyle(this, options.save);
     }
   };
 

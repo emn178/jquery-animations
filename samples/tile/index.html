@@ -55,8 +55,8 @@
           <h3><label class="options-toggle" for="show-alternate">Alternate</label></h3>
           <div id="alternates" class="toggle-container">
             <div>
-              <input id="combine" type="checkbox" checked="checked"/>
-              <label for="combine">Combine</label>
+              <input id="combine2" type="checkbox" checked="checked"/>
+              <label for="combine2">Combine</label>
             </div>
           </div>
         </div>
@@ -106,12 +106,10 @@
             <input type="number" id="cols" name="cols" step="1" min="0" />
             <label for="cycle" class="custom">Cycle</label>
             <input type="number" id="cycle" name="cycle" step="1" min="0" />
-            <input id="ordering" name="ordering" type="checkbox" value="true" checked="checked"/>
-            <label for="ordering" class="custom">Ordering</label>
-            <input id="adjustDuration" name="adjustDuration" type="checkbox" value="true" checked="checked"/>
-            <label for="adjustDuration" class="custom">Adjust Duration</label>
-            <label for="order" class="custom">Order</label>
-            <select id="order" name="order">
+            <input id="sequent" name="sequent" type="checkbox" value="true" checked="checked"/>
+            <label for="sequent" class="custom">Sequent</label>
+            <label for="sequence" class="custom">Sequence</label>
+            <select id="sequence" name="sequence">
               <option value=""></option>
               <option value="random">Random</option>
               <option value="randomCols">Random Columns</option>
@@ -129,6 +127,8 @@
               <option value="btlr">Bottom-Top Left-Right</option>
               <option value="btrl">Bottom-Top Right-Left</option>
             </select>
+            <input id="adjustDuration" name="adjustDuration" type="checkbox" value="true" checked="checked"/>
+            <label for="adjustDuration" class="custom">Adjust Duration</label>
           </div>
         </div>
       </div>
