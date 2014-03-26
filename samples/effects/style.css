@@ -195,3 +195,14 @@ select {
   border-top: 10px solid gray;
   border-bottom: 0;
 }
+/*
+#container {
+  position: relative;
+  left: 100px;
+
+}
+
+#image {
+  position: absolute;
+  left: 100px;
+}*/

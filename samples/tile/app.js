@@ -3,6 +3,7 @@
   var effect = '';
   var options = {};
   var lastChecked;
+  var lastChecked2;
 
   function animate()
   {
@@ -18,8 +19,18 @@
     var isCombine = $('#combine').is(':checked');
     if(!isCombine)
     {
-      $('.animation-check:checked').filter(function() {
+      $('#effect .animation-check:checked').filter(function() {
         if(this.id == lastChecked)
+          return;
+        $(this).attr('checked', false);
+      });
+    }
+
+    isCombine = $('#combine2').is(':checked');
+    if(!isCombine)
+    {
+      $('#alternate .animation-check:checked').filter(function() {
+        if(this.id == lastChecked2)
           return;
         $(this).attr('checked', false);
       });
@@ -69,7 +80,12 @@
     var animationId = element.attr('id');
     $('#option-' + animationId).toggleClass('disable');
     if(!element.is(':checked'))
-      lastChecked = animationId;
+    {
+      if(element.parents('#effect').length > 0)
+        lastChecked = animationId;
+      else
+        lastChecked2 = animationId;
+    }
   }
 
   function addButton(key, container)
@@ -88,7 +104,6 @@
         continue;
       addButton(key, 'effects');
       addButton(key, 'alternates');
-      // add(key);
     }
 
     $('#submit').click(animate);
@@ -122,7 +137,7 @@
     options = {
       duration: 2000,
       rows: 50,
-      ordering: false,
+      sequent: false,
       effect: 'slideFromDown'
     };
     animate();
@@ -134,7 +149,7 @@
       rows: 200,
       effect: 'shake',
       cycle: 50,
-      order: 'tb',
+      sequence: 'tb',
       adjustDuration: false
     };
     animate();
@@ -145,7 +160,7 @@
       duration: 2000,
       cols: 200,
       effect: 'bounce',
-      order: 'lr'
+      sequence: 'lr'
     };
     animate();
   }
@@ -161,8 +176,8 @@
         'slideFromUp',
         'slideFromLeft'
       ],
-      order: 'lrtb',
-      ordering: false,
+      sequence: 'lrtb',
+      sequent: false,
       adjustDuration: true
     };
     animate();

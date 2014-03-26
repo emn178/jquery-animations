@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.3.7
+ * jQuery-animations v0.3.8
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -146,6 +146,7 @@
     if(!tasks)
       this.cleaner = true;
     ++tasks;
+    this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position']);
     this.element.attr('animation-tasks', tasks);
     this.ontasksend = this.ontasksend.bind(this);
     this.onstart = this.onstart.bind(this);
@@ -362,6 +363,7 @@
         inner = inner.parent();
       wrapper.replaceWith(inner);
     }
+    $.restoreStyle(this.element, this.styleState);
   };
 
   function Job(element, options)
@@ -613,24 +615,50 @@
   {
     var wrapper = $('<span></span>');
     var display = element.attr('animation-display') || element.css('display');
-    if(display == 'block')
-      wrapper.css('display', 'block');
-    else if(display == 'none')
-      wrapper.css('display', 'none');
-    else if(supportFlex)
-      wrapper.css('display', 'inline-flex');
-    else
-      wrapper.css('display', 'inline-block');
+    element.attr('animation-display', display);
+    
+    if(display == 'inline')
+    {
+      if(supportFlex)
+        display = 'inline-flex';
+      else
+        display = 'inline-block';
+    }
+    wrapper.css('display', display);
+
     wrapper.attr('animation-wrapper', 1);
     if(element.css('float') != 'none')
       wrapper.css('float', element.css('float'));
+
+    var w = element.outerWidth();
+    var h = element.outerHeight();
+
+    wrapper.css({
+      'margin-left': element.css('margin-left'),
+      'margin-right': element.css('margin-right'),
+      'margin-top': element.css('margin-top'),
+      'margin-bottom': element.css('margin-bottom'),
+      'width': w + 'px',
+      'height': h + 'px'
+    });
+    element.css({
+      width: w + 'px',
+      height: h + 'px',
+      margin: '0'
+    });
+
     if(element.css('position') != 'static')
     {
       wrapper.css('position', element.css('position'));
       wrapper.css('z-index', element.css('z-index'));
+      wrapper.css('left', element.css('left'));
+      wrapper.css('right', element.css('right'));
+      wrapper.css('top', element.css('top'));
+      wrapper.css('bottom', element.css('bottom'));
+      element.css('position', 'static');
     }
+
     element.wrap(wrapper);
-    element.attr('animation-display', display);
     return element.parent();
   }
 
