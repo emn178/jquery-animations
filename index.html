@@ -139,6 +139,12 @@
 <p>Sets the flag determining the animations applies to a new wrapper.</p>
 
 <h6>
+<a name="autowrap-boolean-default-true" class="anchor" href="#autowrap-boolean-default-true"><span class="octicon octicon-link"></span></a><em>autoWrap: <code>Boolean</code> (default: <code>true</code>)</em>
+</h6>
+
+<p>Sets the flag determining the animations applies to a new wrapper when combine other animations automatically. You can disable this flag if the animations are simple without conflicts for better performace. eg. fadeOut and shake can apply in the same element easily, but shake and bounce use the same css property and conflict.</p>
+
+<h6>
 <a name="prepare-functionoptions" class="anchor" href="#prepare-functionoptions"><span class="octicon octicon-link"></span></a><em>prepare: <code>Function(options)</code></em>
 </h6>
 
@@ -260,7 +266,7 @@
 
 <p>Sometimes you could combine mutiple animations frequent use to a new one.</p>
 
-<div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">.</span><span class="nx">animations</span><span class="p">[</span><span class="s1">'hit'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">fusion</span><span class="o">:</span> <span class="s1">'fadeOut shake bounce'</span> <span class="p">};</span>
+<div class="highlight highlight-JavaScript"><pre><span class="nx">$</span><span class="p">.</span><span class="nx">animations</span><span class="p">[</span><span class="s1">'hit'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">shortcut</span><span class="o">:</span> <span class="s1">'fadeOut shake bounce'</span> <span class="p">};</span>
 <span class="c1">// now you can call the new animation 'hit'</span>
 <span class="nx">$</span><span class="p">(</span><span class="s1">'#want-to-animate'</span><span class="p">).</span><span class="nx">animate</span><span class="p">(</span><span class="s1">'hit'</span><span class="p">);</span>
 </pre></div>
@@ -288,6 +294,12 @@
 
   <span class="c1">// Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.</span>
   <span class="nx">combinable</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+
+  <span class="c1">// Sets the flag determining the animations applies to a new wrapper.</span>
+  <span class="nx">wrap</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+
+  <span class="c1">// Sets the flag determining the animations applies to a new wrapper when combine other animations automatically. You can disable this flag if the animations are simple without conflicts for better performace. eg. fadeOut and shake can apply in the same element easily, but shake and bounce use the same css property and conflict.</span>
+  <span class="nx">autoWrap</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
 
   <span class="c1">// Sets the callback function to call once animations are ready to begin.</span>
   <span class="nx">prepare</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
