@@ -187,6 +187,12 @@
 <p>Sets the callback function to call when the animation clear or reset triggered.</p>
 
 <h6>
+<a name="resize-functionoptions" class="anchor" href="#resize-functionoptions"><span class="octicon octicon-link"></span></a><em>resize: <code>Function(options)</code></em>
+</h6>
+
+<p>Sets the callback function to call when the window resize and you can handle your customized animations.</p>
+
+<h6>
 <a name="custom-object" class="anchor" href="#custom-object"><span class="octicon octicon-link"></span></a><em>custom: <code>Object</code></em>
 </h6>
 
@@ -302,19 +308,25 @@
   <span class="nx">autoWrap</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
 
   <span class="c1">// Sets the callback function to call once animations are ready to begin.</span>
-  <span class="nx">prepare</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+  <span class="nx">prepare</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span> <span class="p">},</span>
 
   <span class="c1">// Sets the callback function to call once the animation begins..</span>
-  <span class="nx">start</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+  <span class="nx">start</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span> <span class="p">},</span>
 
   <span class="c1">// Sets the callback function to call once the animation is complete.</span>
-  <span class="nx">complete</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+  <span class="nx">complete</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span> <span class="p">},</span>
 
   <span class="c1">// Sets the callback function to call when the animation fails to complete.</span>
-  <span class="nx">fail</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+  <span class="nx">fail</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span> <span class="p">},</span>
 
   <span class="c1">// Sets the callback function to call when the animation completes or stops without completing.</span>
-  <span class="nx">always</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
+  <span class="nx">always</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span> <span class="p">},</span>
+
+  <span class="c1">// Sets the callback function to call when the animation clear or reset triggered.</span>
+  <span class="nx">clear</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span> <span class="p">},</span>
+
+  <span class="c1">// Sets the callback function to call when the window resize and you can handle your customized animations.</span>
+  <span class="nx">resize</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{},</span>
 
   <span class="c1">// Sets the callback function to call when the animation completes or stops without completing. But, if there is any animation running inside target element, it won't trigger untill all done.</span>
   <span class="nx">end</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">},</span>
