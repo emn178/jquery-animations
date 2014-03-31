@@ -4,6 +4,31 @@
     to: { transform: 'translate${axis}(0)' }
   };
 
+  function setVariables(options, element, distance)
+  {
+    var w = element.outerWidth();
+    var h = element.outerHeight();
+    switch(options.variables.direction)
+    {
+      case 'up':
+        options.variables.axis = 'Y';
+        options.variables.distance = -distance || -h;
+        break;
+      case 'down':
+        options.variables.axis = 'Y';
+        options.variables.distance = distance || h;
+        break;
+      case 'left':
+        options.variables.axis = 'X';
+        options.variables.distance = -distance || -w;
+        break;
+      case 'right':
+        options.variables.axis = 'X';
+        options.variables.distance = distance || w;
+        break;
+    }
+  }
+
   var animation = {
     duration: 1000,
     keyframes: keyframes,
@@ -12,34 +37,21 @@
       distance: null
     },
     prepare: function(options) {
-      var element = $(this);
-      var w = element.outerWidth();
-      var h = element.outerHeight();
-      options.wrapper.css('overflow', 'hidden');
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
         distance = variables.distance;
-      var direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
-      switch(direction)
-      {
-        case 'up':
-          variables.axis = 'Y';
-          options.variables.distance = -distance || -h;
-          break;
-        case 'down':
-          variables.axis = 'Y';
-          options.variables.distance = distance || h;
-          break;
-        case 'left':
-          variables.axis = 'X';
-          options.variables.distance = -distance || -w;
-          break;
-        case 'right':
-          variables.axis = 'X';
-          options.variables.distance = distance || w;
-          break;
-      }
+      else
+        options.auto = true;
+      options.variables.direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
+
+      setVariables(options, $(this), distance);
+      options.wrapper.css('overflow', 'hidden');
+    },
+    resize: function(options) {
+      if(!options.auto || options.remainingRepeat == 1)
+        return;
+      setVariables(options, $(this), 0);
     }
   };
 

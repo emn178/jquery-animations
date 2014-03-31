@@ -57,12 +57,16 @@
       var element = $(this);
       var name = element.attr('name');
       var value = element.val();
-      if(element.attr('type') == 'number')
-        value = parseInt(value);
-      if(value)
-        options[name] = value;
+      if(element.attr('data-type') == 'bool' && value)
+        options[name] = value == 'true';
+      else
+      {
+        if(element.attr('type') == 'number')
+          value = parseInt(value);
+        if(value)
+          options[name] = value;
+      }
     });
-
 
     $('.custom:not(.disable)').each(function() {
       var custom = $(this);
