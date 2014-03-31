@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.3.8
+ * jQuery-animations v0.4.0
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -10,6 +10,7 @@
 ;(function($, window, document, undefined) {
   var animationstart = 'animationstart webkitAnimationStart oAnimationStart';
   var animationend = 'animationend webkitAnimationEnd oAnimationEnd';
+  var animationiteration = 'animationiteration webkitAnimationIteration oAnimationIteration';
   var vendorPrefix = '';
   $(['WebkitTransform', 'MozTransform', 'msTransform', 'OTransform']).each(function(i, v) {
     if(v in document.documentElement.style)
@@ -22,6 +23,7 @@
   testElement = null;
 
   var id = 0;
+  var taskId = 0;
   var observations = [];
 
   function Action(elements, animations, options)
@@ -98,6 +100,7 @@
       options.fail = [animation.fail, options.fail];
       options.end = [animation.end, options.end];
       options.clear = [animation.clear, options.clear];
+      options.resize = animation.resize;
       options.name = animation.name;
       options.keyframes = animation.keyframes;
       options.emptyAnimation = animation.emptyAnimation;
@@ -125,6 +128,7 @@
 
   function Task(element, options, jobsOptions)
   {
+    this.taskId = taskId++;
     this.element = $(element);
     this.options = options;
     this.options.element = this.element;
@@ -142,23 +146,27 @@
   Task.prototype.start = function() {
     this.element.reset();
     this.combine();
-    var tasks = parseInt(this.element.attr('animation-tasks')) || 0;
-    if(!tasks)
+    var tasks = this.element.attr('animation-tasks') || 0;
+    if(tasks == 0)
       this.cleaner = true;
-    ++tasks;
-    this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position']);
-    this.element.attr('animation-tasks', tasks);
+    this.element.attr('animation-tasks', tasks + 1);
+    addTaskId(this.element, this.taskId);
+    if(!this.options.derivative && !this.element.attr('animation-wrapper'))
+      this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position']);
     this.ontasksend = this.ontasksend.bind(this);
     this.onstart = this.onstart.bind(this);
     this.oncancel = this.oncancel.bind(this);
     this.onfinish = this.onfinish.bind(this);
+    this.onresize = this.onresize.bind(this);
+    this.onremove = this.onremove.bind(this);
     this.element.on('animationtasksend', this.ontasksend);
     this.element.on('animationcancel', this.oncancel);
     this.element.on('animationfinish', this.onfinish);
+    this.element.on('animationresize', this.onresize);
+    this.element.on('remove', this.onremove);
     callback(this.options.prepare, this.element[0], [this.options]);
 
     this.actor = this.element;
-    var css = '';
     this.jobs = [];
     this.jobsOptions.sort(function(a, b) {
       return a.wrap ? -1 : (b.wrap ? 1 : 0);
@@ -167,29 +175,40 @@
     if(!this.options.autoWrap)
       this.combineOptions();
 
+    var css = '';
     for(var i = 0;i < this.jobsOptions.length;++i)
     {
       var options = $.extend({}, this.jobsOptions[i]);
+      var logs = [];
       if(this.options.combinable || i > 0)
+      {
+        var element = this.actor;
         this.actor = wrap(this.actor);
+        logs.push({element: element, wrapper: this.actor});
+      }
       if(options.fillMode == 'forwards' || options.fillMode == 'both')
         this.reset = false;
       if(options.wrap)
+      {
         options.wrapper = wrap(this.actor);
+        logs.push({element: this.actor, wrapper: options.wrapper});
+      }
 
       var preparesOptions = options.combinedJobs || [options];
       for(var j = 0;j < preparesOptions.length;++j)
       {
         var prepareOptions = preparesOptions[j];
+        prepareOptions.variables = $.extend({}, prepareOptions.variables);
         callback(prepareOptions.prepare, this.actor[0], [prepareOptions]);
         if(prepareOptions.keyframes)
         {
           prepareOptions.name = 'a' + ++id;
-          css += generateKeyframeCss({
+          prepareOptions.keyframeCss = generateKeyframeCss({
             name: prepareOptions.name,
             keyframes: prepareOptions.keyframes,
             variables: prepareOptions.variables
           });
+          css += prepareOptions.keyframeCss;
         }
       }
 
@@ -199,8 +218,9 @@
       options.always = [options.always, this.onalways.bind(this)];
       options.originalElement = this.element;
       options.element = this.actor;
-      this.jobs.push(new Job(this.actor, options));
-
+      var job = new Job(this.actor, options);
+      job.logs = logs;
+      this.jobs.push(job);
       if(options.wrap)
         this.actor = options.wrapper;
     }
@@ -262,6 +282,47 @@
     this.jobsOptions = newJobsOptions;
   };
 
+  Task.prototype.onresize = function(e) {
+    e.stopPropagation();
+    if(!this.options.derivative)
+      $.restoreStyle(this.element, this.styleState);
+    var changed = false;
+    var css = '';
+    for(var i = 0;i < this.jobs.length;++i)
+    {
+      var job = this.jobs[i];
+      for(var j = 0;j < job.logs.length;++j)
+      {
+        var log = job.logs[j];
+        formatStyle(log.element, log.wrapper);
+      }
+      job.resize();
+
+      var preparesOptions = job.preparesOptions;
+      for(var j = 0;j < preparesOptions.length;++j)
+      {
+        var prepareOptions = preparesOptions[j];
+        if(prepareOptions.keyframes)
+        {
+          var keyframeCss = generateKeyframeCss({
+            name: prepareOptions.name,
+            keyframes: prepareOptions.keyframes,
+            variables: prepareOptions.variables
+          });
+          css += keyframeCss;
+          if(prepareOptions.keyframeCss != keyframeCss)
+          {
+            job.refresh(prepareOptions.name);
+            prepareOptions.keyframeCss = keyframeCss;
+            changed = true;
+          }
+        }
+      }
+    }
+    if(changed && this.style)
+      this.style.html(css);
+  };
+
   Task.prototype.onstart = function() {
     if(this.started)
       return;
@@ -286,13 +347,14 @@
     if(this.counter.fail == this.counter.always)
       callback(this.options.fail, this.element[0], [this.options]);
     callback(this.options.always, this.element[0], [this.options]);
-    var tasks = parseInt(this.element.attr('animation-tasks')) || 0;
-    if(tasks == 1)
+    var tasks = parseInt(this.element.attr('animation-tasks'));
+    if(tasks == 1 && !this.hasOtherTasks())
+    {
       this.element.removeAttr('animation-tasks');
+      this.element.trigger('animationtasksend');
+    }
     else
       this.element.attr('animation-tasks', tasks - 1);
-    if(tasks == 1 && !this.hasOtherTasks())
-      this.element.trigger('animationtasksend');
   };
 
   Task.prototype.ontasksend = function() {
@@ -302,14 +364,13 @@
     this.element.off('animationcancel', this.oncancel);
     this.element.off('animationfinish', this.onfinish);
     this.element.removeAttr('animation-combinable');
-    this.element.removeAttr('animation-display');
-    if(!this.options.noClear && (this.reset || this.counter.fail == this.counter.always))
+    if(!this.options.derivative && (this.reset || this.counter.fail == this.counter.always))
       this.clear();
     else
     {
       this.element.attr('animation-resetable', 1);
       this.onreset = this.onreset.bind(this);
-      this.element.on('animationreset', this.onreset);
+      this.element.on('animationreset animationcancel animationfinish', this.onreset);
     }
     for(var i = 0;i < this.jobs.length;++i)
       this.jobs[i].end();
@@ -331,8 +392,15 @@
     if(e.target != this.element[0])
       return;
     this.element.off('animationreset', this.onreset);
+    this.element.off('animationcancel', this.onreset);
+    this.element.off('animationfinish', this.onreset);
     this.element.removeAttr('animation-resetable');
     this.clear();
+  };
+
+  Task.prototype.onremove = function(e) {
+    if(this.style)
+      this.style.remove();
   };
 
   Task.prototype.isDone = function() {
@@ -344,6 +412,10 @@
   };
 
   Task.prototype.clear = function() {
+    this.element.off('animationresize', this.onresize);
+    this.element.off('remove', this.onremove);
+    removeTaskId(this.element, this.taskId);
+    this.element.removeAttr('animation-display');
     this.element.vendorCss('animation', '');
     if(this.style)
       this.style.remove();
@@ -370,6 +442,7 @@
   {
     this.element = $(element);
     this.options = options;
+    this.updateAnimations = {};
     this.prepare();
     this.counter = {
       complete: 0,
@@ -411,14 +484,23 @@
       element.vendorCss('animation', element.attr('animation-prepare'));
       element.removeAttr('animation-prepare');
       this.onend = this.onend.bind(this);
+      this.oniteration = this.oniteration.bind(this);
       element.on(animationend, this.onend);
+      element.on(animationiteration, this.oniteration);
       for(var i = 0;i < this.preparesOptions.length;++i)
         observe(element, new Date().getTime() + this.preparesOptions[i].delay + this.preparesOptions[i].timeout);
     }
   };
 
   Job.prototype.prepare = function() {
-    var preparesOptions = this.options.combinedJobs || [this.options];
+    this.preparesOptions = this.options.combinedJobs || [this.options];
+    for(var i = 0;i < this.preparesOptions.length;++i)
+      this.preparesOptions[i].remainingRepeat = this.preparesOptions[i].repeat;
+    this.combinedCount = this.preparesOptions.length;
+    this.element.attr('animation-prepare', this.generateAnimationCss(this.preparesOptions));
+  };
+
+  Job.prototype.generateAnimationCss = function(preparesOptions) {
     var properties = [];
     for(var i = 0;i < preparesOptions.length;++i)
     {
@@ -428,14 +510,12 @@
         options.duration / 1000 + 's', 
         options.easing, 
         options.delay / 1000 + 's', 
-        options.repeat, 
+        options.remainingRepeat, 
         options.direction,
         options.fillMode,
       ].join(' '));
     }
-    this.combinedCount = preparesOptions.length;
-    this.preparesOptions = preparesOptions;
-    this.element.attr('animation-prepare', properties.join(','));
+    return properties.join(',');
   };
 
   Job.prototype.onstart = function(e) {
@@ -475,6 +555,32 @@
       this.finish(true);
   };
 
+  Job.prototype.oniteration = function(e) {
+    e.stopPropagation();
+    var animationName = e.originalEvent.animationName;
+    var tempOptions = []
+    for(var i = 0;i < this.preparesOptions.length;++i)
+    {
+      var options = this.preparesOptions[i];
+      if(options.name != animationName)
+      {
+        tempOptions.push(options);
+        continue;
+      }
+      if(options.remainingRepeat != 'infinite')
+        --options.remainingRepeat;
+    }
+    if(!this.updateAnimations[animationName])
+      return;
+    this.updateAnimations[animationName] = false;
+
+    var element = this.element;
+    element.vendorCss('animation', this.generateAnimationCss(tempOptions));
+    setTimeout(function() {
+      element.vendorCss('animation', this.generateAnimationCss(this.preparesOptions));
+    }.bind(this), 1);
+  };
+
   Job.prototype.onfinish = function(e) {
     this.finish(true);
   };
@@ -484,6 +590,7 @@
     var element = this.element;
     element.off(animationstart, this.onstart);
     element.off(animationend, this.onend);
+    element.off(animationiteration, this.oniteration);
     element.off('animationfail', this.onfail);
     element.off('animationcancel', this.oncancel);
     element.off('animationfinish', this.onfinish);
@@ -501,6 +608,14 @@
 
   Job.prototype.clear = function() {
     callback(this.options.clear, this.element[0], [this.options]);
+  };
+
+  Job.prototype.resize = function() {
+    callback(this.options.resize, this.element[0], [this.options]);
+  };
+
+  Job.prototype.refresh = function(animationName) {
+    this.updateAnimations[animationName] = true;
   };
 
   var directions = {
@@ -584,7 +699,8 @@
       && isEmptyCallbacks(options.always)
       && isEmptyCallbacks(options.fail)
       && isEmptyCallbacks(options.end)
-      && isEmptyCallbacks(options.clear);
+      && isEmptyCallbacks(options.clear)
+      && isEmptyCallbacks(options.reset);
   }
 
   function isEmptyCallbacks(callbacks)
@@ -614,17 +730,29 @@
   function wrap(element) 
   {
     var wrapper = $('<span></span>');
-    var display = element.attr('animation-display') || element.css('display');
-    element.attr('animation-display', display);
-    
-    if(display == 'inline')
+    formatStyle(element, wrapper);
+    element.wrap(wrapper);
+    return element.parent();
+  }
+
+  function formatStyle(element, wrapper)
+  {
+    if(wrapper.attr('animation-display'))
+      wrapper.css('display', wrapper.attr('animation-display'));
+    else
     {
-      if(supportFlex)
-        display = 'inline-flex';
-      else
-        display = 'inline-block';
+      var display = element.attr('animation-display') || element.css('display');
+      element.attr('animation-display', display);
+      
+      if(display == 'inline')
+      {
+        if(supportFlex)
+          display = 'inline-flex';
+        else
+          display = 'inline-block';
+      }
+      wrapper.css('display', display);
     }
-    wrapper.css('display', display);
 
     wrapper.attr('animation-wrapper', 1);
     if(element.css('float') != 'none')
@@ -632,20 +760,21 @@
 
     var w = element.outerWidth();
     var h = element.outerHeight();
-
     wrapper.css({
       'margin-left': element.css('margin-left'),
       'margin-right': element.css('margin-right'),
       'margin-top': element.css('margin-top'),
       'margin-bottom': element.css('margin-bottom'),
-      'width': w + 'px',
-      'height': h + 'px'
+      'width': w,
+      'height': h,
     });
     element.css({
-      width: w + 'px',
-      height: h + 'px',
-      margin: '0'
+      width: w,
+      height: h,
+      margin: 0
     });
+    // if(!element.attr('animation-wrapper'))
+      // element.css('margin-top', -parseFloat(element.children().first().css('margin-top')));
 
     if(element.css('position') != 'static')
     {
@@ -657,10 +786,8 @@
       wrapper.css('bottom', element.css('bottom'));
       element.css('position', 'static');
     }
-
-    element.wrap(wrapper);
-    return element.parent();
   }
+
 
   function saveStyle(element, properties)
   {
@@ -676,6 +803,31 @@
     element = $(element)[0];
     for(var propertyName in style)
       element.style[propertyName] = style[propertyName];
+  }
+
+  function addTaskId(element, taskId)
+  {
+    var taskIds = getTaskIds(element);
+    taskIds.push(taskId);
+    element.attr('animation-tasksIds', taskIds.join(','));
+  }
+
+  function removeTaskId(element, taskId)
+  {
+    var taskIds = getTaskIds(element).filter(function(id) {
+      return id != taskId;
+    });
+    var attr = taskIds.join(',');
+    if(attr)
+      element.attr('animation-tasksIds', attr);
+    else
+      element.removeAttr('animation-tasksIds');
+  }
+
+  function getTaskIds(element)
+  {
+    var taskIds = element.attr('animation-tasksIds');
+    return taskIds ? taskIds.split(',') : [];
   }
 
   function generateKeyframeCss(options) {
@@ -736,11 +888,23 @@
     new Action(this, animations, options || {}).start();
   }
 
+  var exclusions = ['id', 'prepare', 'start', 'complete', 'always', 'fail', 'end', 'clear', 'reset', 'name', 'keyframes', 'emptyAnimation', 'wrap', 'combinable', 'wrapper', 'element', 'originalElement', 'prepareOptions'];
+  function cloneBasicOptions(options)
+  {
+    var cloneOptions = $.extend({}, options);
+    exclusions.forEach(function(key) {
+      delete cloneOptions[key];
+    });
+    return cloneOptions;
+  }
+
   $.animations = {};
   $.wrap = wrap;
   $.defineAnimation = defineAnimation;
   $.saveStyle = saveStyle;
   $.restoreStyle = restoreStyle;
+  $.cloneBasicOptions = cloneBasicOptions;
+  $.resizeDebouncing = 150;
 
   var origAnimate = $.fn.animate;
   $.fn.animate = function(param1, param2) {
@@ -780,6 +944,56 @@
     this.css(propertyName, value);
     this.css(vendorPrefix + propertyName, value);
   };
+
+  $.event.special.remove = {
+    remove: function(o) {
+      if (o.handler) {
+        o.handler()
+      }
+    }
+  };
+
+  var resizeTimer;
+  function resize()
+  {
+    if(resizeTimer)
+    {
+      clearTimeout(resizeTimer);
+      resizeTimer = null;
+    }
+    resizeTimer = setTimeout(function() {
+      $('[animation-wrapper]').css({
+        display: '',
+        width: '',
+        height: '',
+        float: '',
+        position: '',
+        margin: ''
+      });
+
+      var tasks = [];
+      var ids = {};
+      $('[animation-tasksIds]').each(function(){
+        var element = $(this);
+        var taskIds = getTaskIds(element);
+        for(var i = 0;i < taskIds.length;++i)
+        {
+          var id = taskIds[i];
+          if(ids[id])
+            continue;
+          ids[id] = true;
+          tasks.push({id: id, element: element});
+        }
+      });
+      tasks = tasks.sort(function(a, b) {
+        return a.id - b.id;
+      });
+      for(var i = 0;i < tasks.length;++i)
+        tasks[i].element.trigger('animationresize');
+    }, $.resizeDebouncing);
+  }
+
+  $(window).resize(resize);
 
   var timer = setInterval(checkFail, 100);
 })(jQuery, window, document);
@@ -828,52 +1042,156 @@
     to: { transform: 'translate(0)' }
   };
 
-  var animation = {
+  var baseAnimation = {
     duration: 1000,
-    keyframes: keyframes,
-    variables: {
-      distance: null
-    },
-    prepare: function(options) {
-      var variables = options.variables;
-      var distance;
-      if(variables.distance && $.isNumeric(variables.distance))
-        distance = variables.distance;
-      if(options.id == 'flyIn' || options.id == 'flyOut')
-      {
-        distance = distance || Math.max($(document).height(), $(document).width());
-        variables.x = parseInt(Math.random() * 2 * distance - distance);
-        variables.y = (distance - Math.abs(variables.x)) * (Math.random() > 0.5 ? 1 : -1);
-        return;
-      }
+    keyframes: keyframes
+  };
 
-      var direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
-      variables.x = 0;
-      variables.y = 0;
-      switch(direction)
+  (function() {
+    function setVariables(options, distance)
+    {
+      options.variables.x = 0;
+      options.variables.y = 0;
+      switch(options.variables.direction)
       {
         case 'up':
-          variables.y = -distance || -$(document).height();
+          options.variables.y = -distance || -documentHeight;
           break;
         case 'down':
-          variables.y = distance || $(document).height();
+          options.variables.y = distance || documentHeight;
           break;
         case 'left':
-          variables.x = -distance || -$(document).width();
+          options.variables.x = -distance || -documentWidth;
           break;
         case 'right':
-          variables.x = distance || $(document).width();
+          options.variables.x = distance || documentWidth;
           break;
       }
     }
-  };
 
-  ['flyFromUp', 'flyFromDown', 'flyFromRight', 'flyFromLeft', 
-   'flyToUp', 'flyToDown', 'flyToRight', 'flyToLeft', 'flyIn', 'flyOut'].forEach(function(name) {
-    $.animations[name] = $.extend({}, animation);
-    if(name.indexOf('To') != -1 || name == 'flyOut')
-      $.animations[name].direction = 'reverse';
-  });
+    var animation = $.extend({}, baseAnimation, {
+      variables: {
+        distance: null
+      },
+      prepare: function(options) {
+        var variables = options.variables;
+        var distance;
+        if(variables.distance && $.isNumeric(variables.distance))
+          distance = variables.distance;
+        else
+          options.auto = true;
+        variables.direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
+        setVariables(options, distance);
+      },
+      resize: function(options) {
+        if(!options.auto || options.remainingRepeat == 1)
+          return;
+        setVariables(options, 0);
+      }
+    });
+
+    ['flyFromUp', 'flyFromDown', 'flyFromRight', 'flyFromLeft', 
+     'flyToUp', 'flyToDown', 'flyToRight', 'flyToLeft'].forEach(function(name) {
+      $.animations[name] = $.extend({}, animation);
+      if(name.indexOf('To') != -1)
+        $.animations[name].direction = 'reverse';
+    });
+  }());
+
+  (function() {
+    var animation = $.extend({}, baseAnimation, {
+      variables: {
+        x: 0,
+        y: 0,
+        relative: false
+      },
+      prepare: function(options) {
+        var variables = options.variables;
+        var position = $(this).position();
+        if(!$.isNumeric(variables.x))
+          variables.x = 0;
+        if(!$.isNumeric(variables.y))
+          variables.y = 0;
+        if(!variables.relative)
+        {
+          var position = $(this).position();
+          variables.x -= position.left;
+          variables.y -= position.top;
+        }
+      }
+    });
+
+    ['flyFrom', 'flyTo'].forEach(function(name) {
+      $.animations[name] = $.extend({}, animation);
+      if(name.indexOf('To') != -1)
+        $.animations[name].direction = 'reverse';
+    });
+  }());
+
+  (function() {
+    function setVariables(options)
+    {
+      var deg = options.variables.deg;
+      var theta = deg * Math.PI / 180;
+      var x = documentWidth;
+      var y = documentHeight;
+      if(deg > 180)
+        y = -y;
+      if(deg > 90 && deg < 270)
+        x = -x;
+      if(deg == 0 || deg == 180)
+        y = 0;
+      else if(deg == 90 || deg == 270)
+        x = 0;
+      else
+      {
+        var cos = Math.cos(theta);
+        var sin = Math.sin(theta);
+        var r1 = x / cos;
+        var r2 = y / sin;
+        if(r1 < r2)
+          y = sin * r1;
+        else
+          x = cos * r2;
+      }
+      options.variables.x = x;
+      options.variables.y = -y;
+    }
+
+    var animation = $.extend({}, baseAnimation, {
+      variables: {
+        deg: null
+      },
+      prepare: function(options) {
+        if(!$.isNumeric(options.variables.deg))
+          options.variables.deg = Math.random() * 360;
+        options.variables.deg %= 360;
+        if(options.variables.deg < 0)
+          options.variables.deg += 360;
+        setVariables(options);
+      },
+      resize: function(options) {
+        if(options.remainingRepeat == 1)
+          return;
+        setVariables(options);
+      }
+    });
+
+    ['flyIn', 'flyOut'].forEach(function(name) {
+      $.animations[name] = $.extend({}, animation);
+      if(name == 'flyOut')
+        $.animations[name].direction = 'reverse';
+    });
+  }());
+
+  var documentWidth, documentHeight;
+  function resize()
+  {
+    documentWidth = $(document).width();
+    documentHeight = $(document).height();
+  }
+  $(window).resize(resize);
+  $(document).ready(resize);
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   var keyframes = {
@@ -903,6 +1221,31 @@
     to: { transform: 'translate${axis}(0)' }
   };
 
+  function setVariables(options, element, distance)
+  {
+    var w = element.outerWidth();
+    var h = element.outerHeight();
+    switch(options.variables.direction)
+    {
+      case 'up':
+        options.variables.axis = 'Y';
+        options.variables.distance = -distance || -h;
+        break;
+      case 'down':
+        options.variables.axis = 'Y';
+        options.variables.distance = distance || h;
+        break;
+      case 'left':
+        options.variables.axis = 'X';
+        options.variables.distance = -distance || -w;
+        break;
+      case 'right':
+        options.variables.axis = 'X';
+        options.variables.distance = distance || w;
+        break;
+    }
+  }
+
   var animation = {
     duration: 1000,
     keyframes: keyframes,
@@ -911,34 +1254,21 @@
       distance: null
     },
     prepare: function(options) {
-      var element = $(this);
-      var w = element.outerWidth();
-      var h = element.outerHeight();
-      options.wrapper.css('overflow', 'hidden');
       var variables = options.variables;
       var distance;
       if(variables.distance && $.isNumeric(variables.distance))
         distance = variables.distance;
-      var direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
-      switch(direction)
-      {
-        case 'up':
-          variables.axis = 'Y';
-          options.variables.distance = -distance || -h;
-          break;
-        case 'down':
-          variables.axis = 'Y';
-          options.variables.distance = distance || h;
-          break;
-        case 'left':
-          variables.axis = 'X';
-          options.variables.distance = -distance || -w;
-          break;
-        case 'right':
-          variables.axis = 'X';
-          options.variables.distance = distance || w;
-          break;
-      }
+      else
+        options.auto = true;
+      options.variables.direction = options.id.match(/(From|To)(.*)$/)[2].toLowerCase();
+
+      setVariables(options, $(this), distance);
+      options.wrapper.css('overflow', 'hidden');
+    },
+    resize: function(options) {
+      if(!options.auto || options.remainingRepeat == 1)
+        return;
+      setVariables(options, $(this), 0);
     }
   };
 
@@ -951,6 +1281,37 @@
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   function tile(wrapper, element, rows, cols) {
+    var isImg = element[0].tagName == 'IMG';
+    var tiles = [], tile, src;
+    if(isImg)
+      src = element.attr('src');
+    for(var i = 0;i < rows;++i)
+    {
+      var rowTiles = [];
+      for(var j = 0;j < cols;++j)
+      {
+        if(isImg)
+          tile = $('<span></span>').css('background-image', 'url(' + src + ')');
+        else
+        {
+          var clone = i == 0 && j == 0 ? element : element.clone();
+          var container = $.wrap(clone);
+          tile = $.wrap(container);
+        }
+        rowTiles.push(tile);
+        wrapper.append(tile);
+      }
+      tiles.push(rowTiles);
+    }
+    styleTiles(element, rows, cols, tiles)
+    if(wrapper.css('display') == 'inline-flex')
+      wrapper.css('display', 'inline-block');
+    wrapper.attr('animation-display', wrapper.css('display'));
+    return tiles;
+  }
+
+  function styleTiles(element, rows, cols, tiles)
+  {
     var width = element.outerWidth();
     var height = element.outerHeight();
     var tileWidth = parseInt(width / cols);
@@ -958,50 +1319,43 @@
     var remainWidth = width - tileWidth * cols;
     var remainHeight = height - tileHeight * rows;
 
-    var tiles = [];
     var isImg = element[0].tagName == 'IMG';
     if(isImg)
-    {
-      var src = element.attr('src');
       element.hide();
-    }
     var offsetY = 0;
     for(var i = 0;i < rows;++i)
     {
-      var rowTiles = [];
+      var rowTiles = tiles[i];
       var useHeight = i < remainHeight ? tileHeight + 1 : tileHeight;
       var y = -offsetY;
       offsetY += useHeight;
       var offsetX = 0;
       for(var j = 0;j < cols;++j)
       {
+        var tile = rowTiles[j];
         var useWidth = j < remainWidth ? tileWidth + 1 : tileWidth;
-        var x = -j * tileWidth;
         var x = -offsetX;
         offsetX += useWidth;
         if(isImg)
         {
-          var tile = $('<span></span>');
           tile.css({
             width: useWidth,
             height: useHeight,
             display: 'inline-block',
             float: 'left',
             'background-position': x + 'px ' + y + 'px',
-            'background-image': 'url(' + src + ')'
+            'background-size': width + 'px ' + height + 'px'
           });
         }
         else
         {
-          var clone = i == 0 && j == 0 ? element : element.clone();
-          var container = $.wrap(clone);
+          var container = tile.children().first();
           container.css({
             width: width,
             height: height,
             display: 'inline-block'
           });
           container.vendorCss('transform', 'translate(' + x + 'px, ' + y + 'px)');
-          var tile = $.wrap(container);
           tile.css({
             width: useWidth,
             height: useHeight,
@@ -1010,15 +1364,8 @@
             float: 'left'
           });
         }
-        
-        rowTiles.push(tile);
-        wrapper.append(tile);
       }
-      tiles.push(rowTiles);
     }
-    if(wrapper.css('display') == 'inline-flex')
-      wrapper.css('display', 'inline-block');
-    return tiles;
   }
 
   function validate(variable, defaultValue)
@@ -1127,7 +1474,6 @@
     }
   };
 
-  var exclusions = ['id', 'prepare', 'start', 'complete', 'always', 'fail', 'end', 'clear', 'name', 'keyframes', 'emptyAnimation', 'wrap', 'combinable', 'wrapper', 'element', 'originalElement', 'prepareOptions'];
   var animation = {
     duration: 2000,
     emptyAnimation: true,
@@ -1146,17 +1492,10 @@
       var rows = validate(options.variables.rows, 1);
       var cols = validate(options.variables.cols, 1);
       var tiles = tile(options.wrapper, element, rows, cols);
+      options.wrapper.hide();
 
-      var subOptions = $.extend({}, options);
-      exclusions.forEach(function(key) {
-        delete subOptions[key];
-      });
-      if(options.variables.adjustDuration)
-        subOptions.duration /= 2;
-
-      if(options.variables.sequent && subOptions.delay == 0)
-        subOptions.delay = 1;
-
+      var subOptions = $.cloneBasicOptions(options);
+      delete subOptions.effect;
       var sequences = createSequences(rows, cols, options.variables.sequence);
       var effects = options.variables.effect;
       if($.isFunction(effects))
@@ -1171,12 +1510,15 @@
             var col = pair[1];
             var cloneOptions = $.extend({}, subOptions);
             var effect = effects.call(this, cloneOptions, row, col);
-            cloneOptions.noClear = true;
+            cloneOptions.derivative = true;
             tiles[row][col].animate(effect, cloneOptions);
           }
         }
+        options.wrapper.show();
         return;
       }
+      if(options.variables.adjustDuration)
+        subOptions.duration /= 2;
 
       if(!$.isArray(effects))
         effects = [effects];
@@ -1187,7 +1529,7 @@
         if(typeof(effect) != 'object')
           effect = {effect: effect};
         effect = $.extend({}, subOptions, effect);
-        effect.noClear = true;
+        effect.derivative = true;
         effectsOptions.push(effect);
       }
       var steps = sequences.length;
@@ -1218,8 +1560,21 @@
           tiles[pair[0]][pair[1]].animate(effect, cloneOptions);
         }
       }
+      options.wrapper.show();
+      options.tiles = tiles;
+    },
+    resize: function(options) {
+      var element = $(this);
+      var rows = options.variables.rows;
+      var cols = options.variables.cols;
+      var width = element.outerWidth();
+      var height = element.outerHeight();
+      if(this.tagName != 'IMG')
+        for(var i = 0;i < rows;++i)
+          for(var j = 0;j < cols;++j)
+            options.tiles[i][j].children().first().children().first().css({width: width, height: height});
+      styleTiles(element, rows, cols, options.tiles);
     }
   };
-
   $.animations['tile'] = animation;
 })(jQuery, window, document);

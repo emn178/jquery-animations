@@ -1,3 +1,10 @@
+# v0.4.0 / 2014-03-31
+
+* Support resizing when animations are running.
+* Add new features to fly plugin.
+* Fly, slide and tile plugin support resizing.
+* Fix some bugs.
+
 # v0.3.8 / 2014-03-26
 
 * Fix non-static position issue.

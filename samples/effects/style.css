@@ -132,6 +132,10 @@ input {
   width: 60px;
 }
 
+input[type=checkbox] {
+  width: auto;
+}
+
 select {
   font-size: 16px;
   height: 40px;

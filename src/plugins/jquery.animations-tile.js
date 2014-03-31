@@ -1,5 +1,36 @@
 ;(function($, window, document, undefined) {
   function tile(wrapper, element, rows, cols) {
+    var isImg = element[0].tagName == 'IMG';
+    var tiles = [], tile, src;
+    if(isImg)
+      src = element.attr('src');
+    for(var i = 0;i < rows;++i)
+    {
+      var rowTiles = [];
+      for(var j = 0;j < cols;++j)
+      {
+        if(isImg)
+          tile = $('<span></span>').css('background-image', 'url(' + src + ')');
+        else
+        {
+          var clone = i == 0 && j == 0 ? element : element.clone();
+          var container = $.wrap(clone);
+          tile = $.wrap(container);
+        }
+        rowTiles.push(tile);
+        wrapper.append(tile);
+      }
+      tiles.push(rowTiles);
+    }
+    styleTiles(element, rows, cols, tiles)
+    if(wrapper.css('display') == 'inline-flex')
+      wrapper.css('display', 'inline-block');
+    wrapper.attr('animation-display', wrapper.css('display'));
+    return tiles;
+  }
+
+  function styleTiles(element, rows, cols, tiles)
+  {
     var width = element.outerWidth();
     var height = element.outerHeight();
     var tileWidth = parseInt(width / cols);
@@ -7,50 +38,43 @@
     var remainWidth = width - tileWidth * cols;
     var remainHeight = height - tileHeight * rows;
 
-    var tiles = [];
     var isImg = element[0].tagName == 'IMG';
     if(isImg)
-    {
-      var src = element.attr('src');
       element.hide();
-    }
     var offsetY = 0;
     for(var i = 0;i < rows;++i)
     {
-      var rowTiles = [];
+      var rowTiles = tiles[i];
       var useHeight = i < remainHeight ? tileHeight + 1 : tileHeight;
       var y = -offsetY;
       offsetY += useHeight;
       var offsetX = 0;
       for(var j = 0;j < cols;++j)
       {
+        var tile = rowTiles[j];
         var useWidth = j < remainWidth ? tileWidth + 1 : tileWidth;
-        var x = -j * tileWidth;
         var x = -offsetX;
         offsetX += useWidth;
         if(isImg)
         {
-          var tile = $('<span></span>');
           tile.css({
             width: useWidth,
             height: useHeight,
             display: 'inline-block',
             float: 'left',
             'background-position': x + 'px ' + y + 'px',
-            'background-image': 'url(' + src + ')'
+            'background-size': width + 'px ' + height + 'px'
           });
         }
         else
         {
-          var clone = i == 0 && j == 0 ? element : element.clone();
-          var container = $.wrap(clone);
+          var container = tile.children().first();
           container.css({
             width: width,
             height: height,
             display: 'inline-block'
           });
           container.vendorCss('transform', 'translate(' + x + 'px, ' + y + 'px)');
-          var tile = $.wrap(container);
           tile.css({
             width: useWidth,
             height: useHeight,
@@ -59,15 +83,8 @@
             float: 'left'
           });
         }
-        
-        rowTiles.push(tile);
-        wrapper.append(tile);
       }
-      tiles.push(rowTiles);
     }
-    if(wrapper.css('display') == 'inline-flex')
-      wrapper.css('display', 'inline-block');
-    return tiles;
   }
 
   function validate(variable, defaultValue)
@@ -176,7 +193,6 @@
     }
   };
 
-  var exclusions = ['id', 'prepare', 'start', 'complete', 'always', 'fail', 'end', 'clear', 'name', 'keyframes', 'emptyAnimation', 'wrap', 'combinable', 'wrapper', 'element', 'originalElement', 'prepareOptions'];
   var animation = {
     duration: 2000,
     emptyAnimation: true,
@@ -195,17 +211,10 @@
       var rows = validate(options.variables.rows, 1);
       var cols = validate(options.variables.cols, 1);
       var tiles = tile(options.wrapper, element, rows, cols);
+      options.wrapper.hide();
 
-      var subOptions = $.extend({}, options);
-      exclusions.forEach(function(key) {
-        delete subOptions[key];
-      });
-      if(options.variables.adjustDuration)
-        subOptions.duration /= 2;
-
-      if(options.variables.sequent && subOptions.delay == 0)
-        subOptions.delay = 1;
-
+      var subOptions = $.cloneBasicOptions(options);
+      delete subOptions.effect;
       var sequences = createSequences(rows, cols, options.variables.sequence);
       var effects = options.variables.effect;
       if($.isFunction(effects))
@@ -220,12 +229,15 @@
             var col = pair[1];
             var cloneOptions = $.extend({}, subOptions);
             var effect = effects.call(this, cloneOptions, row, col);
-            cloneOptions.noClear = true;
+            cloneOptions.derivative = true;
             tiles[row][col].animate(effect, cloneOptions);
           }
         }
+        options.wrapper.show();
         return;
       }
+      if(options.variables.adjustDuration)
+        subOptions.duration /= 2;
 
       if(!$.isArray(effects))
         effects = [effects];
@@ -236,7 +248,7 @@
         if(typeof(effect) != 'object')
           effect = {effect: effect};
         effect = $.extend({}, subOptions, effect);
-        effect.noClear = true;
+        effect.derivative = true;
         effectsOptions.push(effect);
       }
       var steps = sequences.length;
@@ -267,8 +279,21 @@
           tiles[pair[0]][pair[1]].animate(effect, cloneOptions);
         }
       }
+      options.wrapper.show();
+      options.tiles = tiles;
+    },
+    resize: function(options) {
+      var element = $(this);
+      var rows = options.variables.rows;
+      var cols = options.variables.cols;
+      var width = element.outerWidth();
+      var height = element.outerHeight();
+      if(this.tagName != 'IMG')
+        for(var i = 0;i < rows;++i)
+          for(var j = 0;j < cols;++j)
+            options.tiles[i][j].children().first().children().first().css({width: width, height: height});
+      styleTiles(element, rows, cols, options.tiles);
     }
   };
-
   $.animations['tile'] = animation;
 })(jQuery, window, document);

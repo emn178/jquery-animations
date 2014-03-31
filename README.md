@@ -89,6 +89,9 @@ Sets the callback function to call when the animation completes or stops without
 ###### *clear: `Function(options)`*
 Sets the callback function to call when the animation clear or reset triggered.
 
+###### *resize: `Function(options)`*
+Sets the callback function to call when the window resize and you can handle your customized animations.
+
 ###### *custom: `Object`*
 Set customized options for each animation. Defines the same key as animation ID or name in this object. Customized options structure is the same with options of global.
 
@@ -178,19 +181,25 @@ $('#want-to-animate').animate('animation1 animation2', {
   autoWrap: true,
 
   // Sets the callback function to call once animations are ready to begin.
-  prepare: function() { },
+  prepare: function(options) { },
 
   // Sets the callback function to call once the animation begins..
-  start: function() { },
+  start: function(options) { },
 
   // Sets the callback function to call once the animation is complete.
-  complete: function() { },
+  complete: function(options) { },
 
   // Sets the callback function to call when the animation fails to complete.
-  fail: function() { },
+  fail: function(options) { },
 
   // Sets the callback function to call when the animation completes or stops without completing.
-  always: function() { },
+  always: function(options) { },
+
+  // Sets the callback function to call when the animation clear or reset triggered.
+  clear: function(options) { },
+
+  // Sets the callback function to call when the window resize and you can handle your customized animations.
+  resize: function(options) {},
 
   // Sets the callback function to call when the animation completes or stops without completing. But, if there is any animation running inside target element, it won't trigger untill all done.
   end: function() { },
