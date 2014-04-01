@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.4.0
+ * jQuery-animations v0.4.1
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -21,6 +21,8 @@
   testElement.style.display = 'inline-flex';
   var supportFlex = testElement.style.display == 'inline-flex';
   testElement = null;
+
+  var firefox = navigator.userAgent.toLowerCase().indexOf('firefox') != -1;
 
   var id = 0;
   var taskId = 0;
@@ -152,7 +154,10 @@
     this.element.attr('animation-tasks', tasks + 1);
     addTaskId(this.element, this.taskId);
     if(!this.options.derivative && !this.element.attr('animation-wrapper'))
+    {
       this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position']);
+      this.styleState2 = $.saveStyle(this.element.children().first(), ['marginTop']);
+    }
     this.ontasksend = this.ontasksend.bind(this);
     this.onstart = this.onstart.bind(this);
     this.oncancel = this.oncancel.bind(this);
@@ -285,7 +290,10 @@
   Task.prototype.onresize = function(e) {
     e.stopPropagation();
     if(!this.options.derivative)
+    {
       $.restoreStyle(this.element, this.styleState);
+      $.restoreStyle(this.element.children().first(), this.styleState2);
+    }
     var changed = false;
     var css = '';
     for(var i = 0;i < this.jobs.length;++i)
@@ -436,6 +444,7 @@
       wrapper.replaceWith(inner);
     }
     $.restoreStyle(this.element, this.styleState);
+    $.restoreStyle(this.element.children().first(), this.styleState2);
   };
 
   function Job(element, options)
@@ -758,23 +767,32 @@
     if(element.css('float') != 'none')
       wrapper.css('float', element.css('float'));
 
-    var w = element.outerWidth();
-    var h = element.outerHeight();
-    wrapper.css({
+    var margin = {
       'margin-left': element.css('margin-left'),
       'margin-right': element.css('margin-right'),
       'margin-top': element.css('margin-top'),
       'margin-bottom': element.css('margin-bottom'),
-      'width': w,
-      'height': h,
+    };
+    if(firefox)
+    {
+      var rect = element[0].getBoundingClientRect();
+      element.css('margin', 0);
+      var rect2 = element[0].getBoundingClientRect();
+      if(margin['margin-left'] == '0px')
+        margin['margin-left'] = rect.left - rect2.left;
+    }
+    wrapper.css(margin);
+    wrapper.css({
+      'width': element.outerWidth(),
+      'height': element.outerHeight(),
     });
     element.css({
-      width: w,
-      height: h,
+      width: element.width(),
+      height: element.height(),
       margin: 0
     });
-    // if(!element.attr('animation-wrapper'))
-      // element.css('margin-top', -parseFloat(element.children().first().css('margin-top')));
+    if(!element.attr('animation-wrapper'))
+      element.children().first().css('margin-top', 0);
 
     if(element.css('position') != 'static')
     {
@@ -792,6 +810,8 @@
   function saveStyle(element, properties)
   {
     element = $(element)[0];
+    if(!element)
+      return;
     var style = {};
     for(var i = 0;i < properties.length;++i)
       style[properties[i]] = element.style[properties[i]];
@@ -801,6 +821,8 @@
   function restoreStyle(element, style)
   {
     element = $(element)[0];
+    if(!element)
+      return;
     for(var propertyName in style)
       element.style[propertyName] = style[propertyName];
   }
@@ -1038,6 +1060,38 @@
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   var keyframes = {
+    from: { 
+      transform: 'rotate${axis}(${from}deg)',
+      'transform-style': 'preserve-3d',
+      'transform-origin': '${origin}'
+    },
+    to: { 
+      transform: 'rotate${axis}(${to}deg)',
+    }
+  };
+
+  var animation = {
+    duration: 1000,
+    wrap: true,
+    keyframes: keyframes,
+    variables: {
+      from: 0,
+      to: 360,
+      origin: '50%',
+      perspective: 600
+    },
+    prepare: function(options) {
+      options.variables.axis = options.id.match(/flip(.*)$/)[1];
+      options.wrapper.vendorCss('perspective', options.variables.perspective);
+    }
+  };
+
+  ['flipX', 'flipY'].forEach(function(name) {
+    $.animations[name] = $.extend({}, animation);
+  });
+})(jQuery, window, document);
+;;(function($, window, document, undefined) {
+  var keyframes = {
     from: { transform: 'translate(${x}px,${y}px)' },
     to: { transform: 'translate(0)' }
   };
@@ -1131,7 +1185,7 @@
   (function() {
     function setVariables(options)
     {
-      var deg = options.variables.deg;
+      var deg = options.variables.degree;
       var theta = deg * Math.PI / 180;
       var x = documentWidth;
       var y = documentHeight;
@@ -1160,14 +1214,14 @@
 
     var animation = $.extend({}, baseAnimation, {
       variables: {
-        deg: null
+        degree: null
       },
       prepare: function(options) {
-        if(!$.isNumeric(options.variables.deg))
-          options.variables.deg = Math.random() * 360;
-        options.variables.deg %= 360;
-        if(options.variables.deg < 0)
-          options.variables.deg += 360;
+        if(!$.isNumeric(options.variables.degree))
+          options.variables.degree = Math.random() * 360;
+        options.variables.degree %= 360;
+        if(options.variables.degree < 0)
+          options.variables.degree += 360;
         setVariables(options);
       },
       resize: function(options) {
@@ -1192,6 +1246,26 @@
   }
   $(window).resize(resize);
   $(document).ready(resize);
+})(jQuery, window, document);
+;;(function($, window, document, undefined) {
+  var keyframes = {
+    from: { 
+      transform: 'rotate(0deg)',
+      'transform-origin': '${origin}'
+    },
+    to: { 
+      transform: 'rotate(${degree}deg)',
+    }
+  };
+
+  $.animations['rotate'] = {
+    duration: 1000,
+    keyframes: keyframes,
+    variables: {
+      degree: 360,
+      origin: '50% 50%'
+    }
+  };
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   var keyframes = {
@@ -1577,4 +1651,50 @@
     }
   };
   $.animations['tile'] = animation;
+})(jQuery, window, document);
+;;(function($, window, document, undefined) {
+  var keyframes = {
+    to: { transform: 'scale(${x},${y})' }
+  };
+
+  var baseAnimation = {
+    duration: 1000,
+    keyframes: keyframes
+  };
+
+  (function() {
+    var animation = $.extend({
+      prepare: function(options) {
+        options.variables.x = 0;
+        options.variables.y = 0;
+      }
+    }, baseAnimation);
+    $.animations['zoomAway'] = animation;
+    $.animations['zoomNear'] = $.extend({direction: 'reverse'}, animation);
+  }());
+
+  (function() {
+    var animation = $.extend({
+      variables: {
+        scale: 1.2
+      },
+      prepare: function(options) {
+        options.variables.x = options.variables.scale;
+        options.variables.y = options.variables.scale;
+      }
+    }, baseAnimation);
+    $.animations['zoomIn'] = animation;
+    $.animations['zoomOut'] = $.extend({direction: 'reverse'}, animation);
+  }());
+
+  (function() {
+    var animation = $.extend({
+      variables: {
+        x: 1,
+        y: 1
+      }
+    }, baseAnimation);
+    $.animations['scaleTo'] = animation;
+    $.animations['scaleFrom'] = $.extend({direction: 'reverse'}, animation);
+  }());
 })(jQuery, window, document);

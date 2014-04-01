@@ -12,6 +12,9 @@
   <script src="../../src/plugins/jquery.animations-bounce.js"></script>
   <script src="../../src/plugins/jquery.animations-slide.js"></script>
   <script src="../../src/plugins/jquery.animations-fly.js"></script>
+  <script src="../../src/plugins/jquery.animations-rotate.js"></script>
+  <script src="../../src/plugins/jquery.animations-zoom.js"></script>
+  <script src="../../src/plugins/jquery.animations-flip.js"></script>
   <script src="app.js"></script>
 </head>
 <body>
@@ -64,6 +67,7 @@
               <option value="normal">Normal</option>
               <option value="alternate">Alternate</option>
               <option value="alternate-reverse">Alternate Reverse</option>
+              <option value="reverse">Reverse</option>
             </select>
             <label for="fillMode">Fill Mode</label>
             <select id="fillMode" name="fillMode">
@@ -80,14 +84,16 @@
             <input type="number" id="x" name="x" step="1" />
             <label for="y" class="custom">*Y</label>
             <input type="number" id="y" name="y" step="1" />
-            <label for="relative">Relative</label>
+            <label for="scale" class="custom">*Scale</label>
+            <input type="number" id="scale" name="scale" step="1" />
+            <label for="relative" class="custom">Relative</label>
             <select id="relative" name="relative" data-type="bool">
               <option value=""></option>
               <option value="true">True</option>
               <option value="false">False</option>
             </select>
-            <label for="deg" class="custom">*Deg</label>
-            <input type="number" id="deg" name="deg" step="1" />
+            <label for="degree" class="custom">*Degree</label>
+            <input type="number" id="degree" name="degree" step="1" />
           </div>
         </div>
       </div>

@@ -1,3 +1,10 @@
+# v0.4.1 / 2014-04-01
+
+* Fix firefox margin bug.
+* Fix margin collapsing bug.
+* Add flip, rotate, zoom plugins.
+* Update fly plugin.
+
 # v0.4.0 / 2014-03-31
 
 * Support resizing when animations are running.

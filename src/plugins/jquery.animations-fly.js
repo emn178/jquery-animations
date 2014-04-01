@@ -93,7 +93,7 @@
   (function() {
     function setVariables(options)
     {
-      var deg = options.variables.deg;
+      var deg = options.variables.degree;
       var theta = deg * Math.PI / 180;
       var x = documentWidth;
       var y = documentHeight;
@@ -122,14 +122,14 @@
 
     var animation = $.extend({}, baseAnimation, {
       variables: {
-        deg: null
+        degree: null
       },
       prepare: function(options) {
-        if(!$.isNumeric(options.variables.deg))
-          options.variables.deg = Math.random() * 360;
-        options.variables.deg %= 360;
-        if(options.variables.deg < 0)
-          options.variables.deg += 360;
+        if(!$.isNumeric(options.variables.degree))
+          options.variables.degree = Math.random() * 360;
+        options.variables.degree %= 360;
+        if(options.variables.degree < 0)
+          options.variables.degree += 360;
         setVariables(options);
       },
       resize: function(options) {
