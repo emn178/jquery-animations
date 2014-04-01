@@ -120,9 +120,12 @@
     $('#wave').click(wave);
     $('#flutter').click(flutter);
     $('#puzzle').click(puzzle);
+    $('#flake').click(flake);
+    $('#blow').click(blow);
   });
 
-  function assemble() {
+  function assemble() 
+  {
     options = {
       duration: 2000,
       rows: 12,
@@ -133,7 +136,8 @@
     animate();
   }
 
-  function blind() {
+  function blind() 
+  {
     options = {
       duration: 2000,
       rows: 50,
@@ -143,7 +147,8 @@
     animate();
   }
 
-  function wave() {
+  function wave() 
+  {
     options = {
       duration: 2000,
       rows: 200,
@@ -155,7 +160,8 @@
     animate();
   }
 
-  function flutter() {
+  function flutter() 
+  {
     options = {
       duration: 2000,
       cols: 200,
@@ -165,7 +171,8 @@
     animate();
   }
 
-  function puzzle() {
+  function puzzle() 
+  {
     options = {
       duration: 2000,
       rows: 9,
@@ -179,6 +186,30 @@
       sequence: 'lrtb',
       sequent: false,
       adjustDuration: true
+    };
+    animate();
+  }
+
+  function flake() 
+  {
+    options = {
+      duration: 3000,
+      rows: 12,
+      cols: 8,
+      effect: 'rotate flipX flyToDown fadeOut',
+      fillMode: 'forwards'
+    };
+    animate();
+  }
+
+  function blow() 
+  {
+    options = {
+      duration: 3000,
+      rows: 12,
+      cols: 8,
+      effect: 'rotate flipX flyToLeft flyToUp',
+      fillMode: 'forwards'
     };
     animate();
   }

@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.4.0
+ * jQuery-animations v0.4.1
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -21,6 +21,8 @@
   testElement.style.display = 'inline-flex';
   var supportFlex = testElement.style.display == 'inline-flex';
   testElement = null;
+
+  var firefox = navigator.userAgent.toLowerCase().indexOf('firefox') != -1;
 
   var id = 0;
   var taskId = 0;
@@ -152,7 +154,10 @@
     this.element.attr('animation-tasks', tasks + 1);
     addTaskId(this.element, this.taskId);
     if(!this.options.derivative && !this.element.attr('animation-wrapper'))
+    {
       this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position']);
+      this.styleState2 = $.saveStyle(this.element.children().first(), ['marginTop']);
+    }
     this.ontasksend = this.ontasksend.bind(this);
     this.onstart = this.onstart.bind(this);
     this.oncancel = this.oncancel.bind(this);
@@ -285,7 +290,10 @@
   Task.prototype.onresize = function(e) {
     e.stopPropagation();
     if(!this.options.derivative)
+    {
       $.restoreStyle(this.element, this.styleState);
+      $.restoreStyle(this.element.children().first(), this.styleState2);
+    }
     var changed = false;
     var css = '';
     for(var i = 0;i < this.jobs.length;++i)
@@ -436,6 +444,7 @@
       wrapper.replaceWith(inner);
     }
     $.restoreStyle(this.element, this.styleState);
+    $.restoreStyle(this.element.children().first(), this.styleState2);
   };
 
   function Job(element, options)
@@ -758,23 +767,32 @@
     if(element.css('float') != 'none')
       wrapper.css('float', element.css('float'));
 
-    var w = element.outerWidth();
-    var h = element.outerHeight();
-    wrapper.css({
+    var margin = {
       'margin-left': element.css('margin-left'),
       'margin-right': element.css('margin-right'),
       'margin-top': element.css('margin-top'),
       'margin-bottom': element.css('margin-bottom'),
-      'width': w,
-      'height': h,
+    };
+    if(firefox)
+    {
+      var rect = element[0].getBoundingClientRect();
+      element.css('margin', 0);
+      var rect2 = element[0].getBoundingClientRect();
+      if(margin['margin-left'] == '0px')
+        margin['margin-left'] = rect.left - rect2.left;
+    }
+    wrapper.css(margin);
+    wrapper.css({
+      'width': element.outerWidth(),
+      'height': element.outerHeight(),
     });
     element.css({
-      width: w,
-      height: h,
+      width: element.width(),
+      height: element.height(),
       margin: 0
     });
-    // if(!element.attr('animation-wrapper'))
-      // element.css('margin-top', -parseFloat(element.children().first().css('margin-top')));
+    if(!element.attr('animation-wrapper'))
+      element.children().first().css('margin-top', 0);
 
     if(element.css('position') != 'static')
     {
@@ -792,6 +810,8 @@
   function saveStyle(element, properties)
   {
     element = $(element)[0];
+    if(!element)
+      return;
     var style = {};
     for(var i = 0;i < properties.length;++i)
       style[properties[i]] = element.style[properties[i]];
@@ -801,6 +821,8 @@
   function restoreStyle(element, style)
   {
     element = $(element)[0];
+    if(!element)
+      return;
     for(var propertyName in style)
       element.style[propertyName] = style[propertyName];
   }

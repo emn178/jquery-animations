@@ -13,6 +13,9 @@
   <script src="../../src/plugins/jquery.animations-slide.js"></script>
   <script src="../../src/plugins/jquery.animations-fly.js"></script>
   <script src="../../src/plugins/jquery.animations-tile.js"></script>
+  <script src="../../src/plugins/jquery.animations-rotate.js"></script>
+  <script src="../../src/plugins/jquery.animations-zoom.js"></script>
+  <script src="../../src/plugins/jquery.animations-flip.js"></script>
   <script src="app.js"></script>
 </head>
 <body>
@@ -38,6 +41,8 @@
         <button id="wave" class="predefined">Wave</button>
         <button id="flutter" class="predefined">Flutter</button>
         <button id="puzzle" class="predefined">Puzzle</button>
+        <button id="flake" class="predefined">Flake</button>
+        <button id="blow" class="predefined">Blow</button>
       </div>
       <div id="animations">
         <input id="show-effect" class="toggle-check" type="checkbox"/>
@@ -88,6 +93,7 @@
               <option value="normal">Normal</option>
               <option value="alternate">Alternate</option>
               <option value="alternate-reverse">Alternate Reverse</option>
+              <option value="reverse">Reverse</option>
             </select>
             <label for="fillMode">Fill Mode</label>
             <select id="fillMode" name="fillMode">
@@ -96,10 +102,6 @@
               <option value="backwards">Backwards</option>
               <option value="both">Both</option>
             </select>
-            <label for="strength" class="custom">*Strength</label>
-            <input type="number" id="strength" name="strength" step="1" min="0" />
-            <label for="distance" class="custom">*Distance</label>
-            <input type="number" id="distance" name="distance" step="1" min="0" />
             <label for="rows" class="custom">Rows</label>
             <input type="number" id="rows" name="rows" step="1" min="0" />
             <label for="cols" class="custom">Cols</label>
@@ -129,6 +131,22 @@
             </select>
             <input id="adjustDuration" name="adjustDuration" type="checkbox" value="true" checked="checked"/>
             <label for="adjustDuration" class="custom">Adjust Duration</label>
+            <label for="strength" class="custom">*Strength</label>
+            <input type="number" id="strength" name="strength" step="1" min="0" />
+            <label for="distance" class="custom">*Distance</label>
+            <input type="number" id="distance" name="distance" step="1" min="0" />
+            <label for="x" class="custom">*X</label>
+            <input type="number" id="x" name="x" step="1" />
+            <label for="y" class="custom">*Y</label>
+            <input type="number" id="y" name="y" step="1" />
+            <label for="relative" class="custom">Relative</label>
+            <select id="relative" name="relative" data-type="bool">
+              <option value=""></option>
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </select>
+            <label for="degree" class="custom">*Degree</label>
+            <input type="number" id="degree" name="degree" step="1" />
           </div>
         </div>
       </div>
