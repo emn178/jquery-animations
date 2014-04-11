@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.4.1
+ * jQuery-animations v0.4.2
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -772,6 +772,8 @@
       'margin-right': element.css('margin-right'),
       'margin-top': element.css('margin-top'),
       'margin-bottom': element.css('margin-bottom'),
+      'width': element.outerWidth(),
+      'height': element.outerHeight()
     };
     if(firefox)
     {
@@ -781,16 +783,12 @@
       if(margin['margin-left'] == '0px')
         margin['margin-left'] = rect.left - rect2.left;
     }
-    wrapper.css(margin);
-    wrapper.css({
-      'width': element.outerWidth(),
-      'height': element.outerHeight(),
-    });
     element.css({
       width: element.width(),
       height: element.height(),
       margin: 0
     });
+    wrapper.css(margin);
     if(!element.attr('animation-wrapper'))
       element.children().first().css('margin-top', 0);
 

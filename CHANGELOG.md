@@ -1,3 +1,7 @@
+# v0.4.2 / 2014-04-11
+
+* Fix resize margin bug.
+
 # v0.4.1 / 2014-04-01
 
 * Fix firefox margin bug.
