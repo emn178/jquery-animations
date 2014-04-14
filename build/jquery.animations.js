@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.4.2
+ * jQuery-animations v0.4.3
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -148,14 +148,14 @@
   Task.prototype.start = function() {
     this.element.reset();
     this.combine();
-    var tasks = this.element.attr('animation-tasks') || 0;
+    var tasks = parseInt(this.element.attr('animation-tasks')) || 0;
     if(tasks == 0)
       this.cleaner = true;
     this.element.attr('animation-tasks', tasks + 1);
     addTaskId(this.element, this.taskId);
     if(!this.options.derivative && !this.element.attr('animation-wrapper'))
     {
-      this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position']);
+      this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position', 'top', 'right', 'bottom', 'left']);
       this.styleState2 = $.saveStyle(this.element.children().first(), ['marginTop']);
     }
     this.ontasksend = this.ontasksend.bind(this);
@@ -800,10 +800,13 @@
       wrapper.css('right', element.css('right'));
       wrapper.css('top', element.css('top'));
       wrapper.css('bottom', element.css('bottom'));
-      element.css('position', 'static');
+      element.css('position', 'relative');
+      element.css('left', '0');
+      element.css('top', '0');
+      element.css('right', '');
+      element.css('bottom', '');
     }
   }
-
 
   function saveStyle(element, properties)
   {
@@ -908,7 +911,7 @@
     new Action(this, animations, options || {}).start();
   }
 
-  var exclusions = ['id', 'prepare', 'start', 'complete', 'always', 'fail', 'end', 'clear', 'reset', 'name', 'keyframes', 'emptyAnimation', 'wrap', 'combinable', 'wrapper', 'element', 'originalElement', 'prepareOptions'];
+  var exclusions = ['id', 'prepare', 'start', 'complete', 'always', 'fail', 'end', 'clear', 'resize', 'reset', 'name', 'keyframes', 'emptyAnimation', 'wrap', 'combinable', 'wrapper', 'element', 'originalElement', 'prepareOptions'];
   function cloneBasicOptions(options)
   {
     var cloneOptions = $.extend({}, options);
@@ -929,16 +932,12 @@
   var origAnimate = $.fn.animate;
   $.fn.animate = function(param1, param2) {
     if(typeof param1 == 'string')
-    {
       animate.call(this, param1, param2);
-      return this;
-    }
     else if(typeof param1 == 'object' && param1.keyframes)
-    {
-      new Action(this, [param1], {}).start();
-      return this;
-    }
-    return origAnimate.apply(this, arguments);
+      new Action(this, [param1], $.cloneBasicOptions(param1)).start();
+    else
+      return origAnimate.apply(this, arguments);
+    return this;
   };
 
   var origStop = $.fn.stop;
@@ -958,11 +957,17 @@
   $.fn.reset = function() {
     if(this.attr('animation-resetable'))
       return this.trigger('animationreset');
+    return this;
   };
 
   $.fn.vendorCss = function(propertyName, value) {
-    this.css(propertyName, value);
-    this.css(vendorPrefix + propertyName, value);
+    if(value === undefined)
+      return this.css(vendorPrefix + propertyName) || this.css(propertyName);
+    else
+    {
+      this.css(propertyName, value);
+      return this.css(vendorPrefix + propertyName, value);
+    }
   };
 
   $.event.special.remove = {
@@ -1040,6 +1045,92 @@
   };
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
+
+  function setVariables(options, element)
+  {
+    if(options.wrapper.css('position') == 'static')
+      options.wrapper.css('position', 'relative');
+    options.wrapper.css('overflow', 'hidden');
+    var canvas = options.canvas;
+    var width = element.width();
+    var height = element.height();
+
+    canvas[0].width = width * 2;
+    canvas[0].height = height * 2;
+    var context = canvas[0].getContext("2d");
+    context.fillStyle = options.variables.color;
+    context.fillRect(0, 0, canvas[0].width, canvas[0].height);
+    context.beginPath();
+    context.arc(width, height, options.radius, 0, 2 * Math.PI, false);
+    context.clip();
+    context.clearRect(0, 0, canvas[0].width, canvas[0].height);
+  }
+
+  $.animations['discover'] = {
+    duration: 5000,
+    emptyAnimation: true,
+    wrap: true,
+    variables: {
+      color: 'rgba(0,0,0,0.8)',
+      radius: 100,
+      count: 5,
+      stopX: null,
+      stopY: null
+    },
+    prepare: function(options) {
+      var element = $(this);
+      var width = element.width();
+      var height = element.height();
+      var canvas = $('<canvas />')
+      canvas.css({
+        position: 'absolute',
+        top: 0,
+        left: 0
+      });
+      options.radius = Math.min(options.variables.radius, height, width);
+      options.canvas = canvas;
+      setVariables(options, element);
+
+      var keyframes = {};
+      var count = options.variables.count || 3;
+      var base = parseInt(count / 0.8);
+      for(var i = 0;i < count;++i)
+      {
+        var percent = i / base * 100 + '%';
+        var x = -Math.random() * 50;
+        var y = -Math.random() * 50;
+        if(i == count - 1 && options.variables.stopX !== null && options.variables.stopY !== null)
+        {
+          var stopX = Math.max(Math.min(options.variables.stopX, 100), 0);
+          var stopY = Math.max(Math.min(options.variables.stopY, 100), 0);
+          x = (stopX - 100) / 2;
+          y = (stopY - 100) / 2;
+        }
+        var frame = { transform: 'translate(' + x + '%, ' + y + '%)' };
+        keyframes[percent] = frame;
+      }
+      var frame = { transform: 'scale(${scale})' };
+      keyframes['100%'] = frame;
+
+      var cloneOptions = $.cloneBasicOptions(options);
+      cloneOptions.keyframes = keyframes;
+      cloneOptions.derivative = true;
+      cloneOptions.prepare = cloneOptions.resize = function(options) {
+        options.variables.scale = Math.max(element.height(), element.width()) / options.radius * Math.sqrt(2);
+      };
+      cloneOptions.fail = function() {
+        element.stop();
+      };
+      canvas.animate(cloneOptions);
+
+      options.wrapper.append(canvas);
+    },
+    resize: function(options) {
+      setVariables(options, $(this));
+    }
+  };
+})(jQuery, window, document);
+;;(function($, window, document, undefined) {
   $.defineAnimation('fadeIn', {
     from: { opacity: 0 },
     to: { opacity: 1 }
@@ -1059,12 +1150,12 @@
 ;;(function($, window, document, undefined) {
   var keyframes = {
     from: { 
-      transform: 'rotate${axis}(${from}deg)',
-      'transform-style': 'preserve-3d',
-      'transform-origin': '${origin}'
+      transform: 'rotate${axis}(${startDeg}deg)',
+      'transform-origin': '${startOrigin}'
     },
     to: { 
-      transform: 'rotate${axis}(${to}deg)',
+      transform: 'rotate${axis}(${endDeg}deg)',
+      'transform-origin': '${endOrigin}'
     }
   };
 
@@ -1073,14 +1164,18 @@
     wrap: true,
     keyframes: keyframes,
     variables: {
-      from: 0,
-      to: 360,
-      origin: '50%',
-      perspective: 600
+      startDeg: 0,
+      endDeg: 360,
+      startOrigin: '50% 50% 0',
+      endOrigin: '50% 50% 0',
+      perspective: 1000,
+      perspectiveOrigin: '50% 50%'
     },
     prepare: function(options) {
       options.variables.axis = options.id.match(/flip(.*)$/)[1];
+      $(this).vendorCss('transform-style', 'preserve-3d');
       options.wrapper.vendorCss('perspective', options.variables.perspective);
+      options.wrapper.vendorCss('perspective-origin', options.variables.perspectiveOrigin);
     }
   };
 
@@ -1248,11 +1343,12 @@
 ;;(function($, window, document, undefined) {
   var keyframes = {
     from: { 
-      transform: 'rotate(0deg)',
-      'transform-origin': '${origin}'
+      transform: 'rotate(${startDeg}deg)',
+      'transform-origin': '${startOrigin}'
     },
     to: { 
-      transform: 'rotate(${degree}deg)',
+      transform: 'rotate(${endDeg}deg)',
+      'transform-origin': '${endOrigin}'
     }
   };
 
@@ -1260,8 +1356,10 @@
     duration: 1000,
     keyframes: keyframes,
     variables: {
-      degree: 360,
-      origin: '50% 50%'
+      startDeg: 0,
+      endDeg: 360,
+      startOrigin: '50% 50% 0',
+      endOrigin: '50% 50% 0'
     }
   };
 })(jQuery, window, document);
@@ -1570,6 +1668,9 @@
       delete subOptions.effect;
       var sequences = createSequences(rows, cols, options.variables.sequence);
       var effects = options.variables.effect;
+      var fail = function() {
+        element.stop();
+      };
       if($.isFunction(effects))
       {
         for(var i = 0;i < sequences.length;++i)
@@ -1580,7 +1681,7 @@
             var pair = step[j];
             var row = pair[0];
             var col = pair[1];
-            var cloneOptions = $.extend({}, subOptions);
+            var cloneOptions = $.extend({fail:fail}, subOptions);
             var effect = effects.call(this, cloneOptions, row, col);
             cloneOptions.derivative = true;
             tiles[row][col].animate(effect, cloneOptions);
@@ -1600,7 +1701,7 @@
         var effect = effects[i];
         if(typeof(effect) != 'object')
           effect = {effect: effect};
-        effect = $.extend({}, subOptions, effect);
+        effect = $.extend({fail:fail}, subOptions, effect);
         effect.derivative = true;
         effectsOptions.push(effect);
       }
@@ -1639,8 +1740,8 @@
       var element = $(this);
       var rows = options.variables.rows;
       var cols = options.variables.cols;
-      var width = element.outerWidth();
-      var height = element.outerHeight();
+      var width = element.width();
+      var height = element.height();
       if(this.tagName != 'IMG')
         for(var i = 0;i < rows;++i)
           for(var j = 0;j < cols;++j)
@@ -1652,7 +1753,13 @@
 })(jQuery, window, document);
 ;;(function($, window, document, undefined) {
   var keyframes = {
-    to: { transform: 'scale(${x},${y})' }
+    from: { 
+      'transform-origin': '${startOrigin}'
+    },
+    to: { 
+      transform: 'scale(${x},${y})',
+      'transform-origin': '${endOrigin}'
+    }
   };
 
   var baseAnimation = {
@@ -1662,6 +1769,10 @@
 
   (function() {
     var animation = $.extend({
+      variables: {
+        startOrigin: '50% 50% 0',
+        endOrigin: '50% 50% 0'
+      },
       prepare: function(options) {
         options.variables.x = 0;
         options.variables.y = 0;
@@ -1674,7 +1785,9 @@
   (function() {
     var animation = $.extend({
       variables: {
-        scale: 1.2
+        scale: 1.2,
+        startOrigin: '50% 50% 0',
+        endOrigin: '50% 50% 0'
       },
       prepare: function(options) {
         options.variables.x = options.variables.scale;
@@ -1689,7 +1802,9 @@
     var animation = $.extend({
       variables: {
         x: 1,
-        y: 1
+        y: 1,
+        startOrigin: '50% 50% 0',
+        endOrigin: '50% 50% 0'
       }
     }, baseAnimation);
     $.animations['scaleTo'] = animation;

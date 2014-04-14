@@ -217,6 +217,9 @@
       delete subOptions.effect;
       var sequences = createSequences(rows, cols, options.variables.sequence);
       var effects = options.variables.effect;
+      var fail = function() {
+        element.stop();
+      };
       if($.isFunction(effects))
       {
         for(var i = 0;i < sequences.length;++i)
@@ -227,7 +230,7 @@
             var pair = step[j];
             var row = pair[0];
             var col = pair[1];
-            var cloneOptions = $.extend({}, subOptions);
+            var cloneOptions = $.extend({fail:fail}, subOptions);
             var effect = effects.call(this, cloneOptions, row, col);
             cloneOptions.derivative = true;
             tiles[row][col].animate(effect, cloneOptions);
@@ -247,7 +250,7 @@
         var effect = effects[i];
         if(typeof(effect) != 'object')
           effect = {effect: effect};
-        effect = $.extend({}, subOptions, effect);
+        effect = $.extend({fail:fail}, subOptions, effect);
         effect.derivative = true;
         effectsOptions.push(effect);
       }
@@ -286,8 +289,8 @@
       var element = $(this);
       var rows = options.variables.rows;
       var cols = options.variables.cols;
-      var width = element.outerWidth();
-      var height = element.outerHeight();
+      var width = element.width();
+      var height = element.height();
       if(this.tagName != 'IMG')
         for(var i = 0;i < rows;++i)
           for(var j = 0;j < cols;++j)

@@ -1,5 +1,5 @@
 /*
- * jQuery-animations v0.4.2
+ * jQuery-animations v0.4.3
  * https://github.com/emn178/jquery-animations
  *
  * Copyright 2014, emn178@gmail.com
@@ -148,14 +148,14 @@
   Task.prototype.start = function() {
     this.element.reset();
     this.combine();
-    var tasks = this.element.attr('animation-tasks') || 0;
+    var tasks = parseInt(this.element.attr('animation-tasks')) || 0;
     if(tasks == 0)
       this.cleaner = true;
     this.element.attr('animation-tasks', tasks + 1);
     addTaskId(this.element, this.taskId);
     if(!this.options.derivative && !this.element.attr('animation-wrapper'))
     {
-      this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position']);
+      this.styleState = $.saveStyle(this.element, ['marginLeft', 'marginRight', 'marginTop', 'marginBottom', 'width', 'height', 'display', 'position', 'top', 'right', 'bottom', 'left']);
       this.styleState2 = $.saveStyle(this.element.children().first(), ['marginTop']);
     }
     this.ontasksend = this.ontasksend.bind(this);
@@ -800,10 +800,13 @@
       wrapper.css('right', element.css('right'));
       wrapper.css('top', element.css('top'));
       wrapper.css('bottom', element.css('bottom'));
-      element.css('position', 'static');
+      element.css('position', 'relative');
+      element.css('left', '0');
+      element.css('top', '0');
+      element.css('right', '');
+      element.css('bottom', '');
     }
   }
-
 
   function saveStyle(element, properties)
   {
@@ -908,7 +911,7 @@
     new Action(this, animations, options || {}).start();
   }
 
-  var exclusions = ['id', 'prepare', 'start', 'complete', 'always', 'fail', 'end', 'clear', 'reset', 'name', 'keyframes', 'emptyAnimation', 'wrap', 'combinable', 'wrapper', 'element', 'originalElement', 'prepareOptions'];
+  var exclusions = ['id', 'prepare', 'start', 'complete', 'always', 'fail', 'end', 'clear', 'resize', 'reset', 'name', 'keyframes', 'emptyAnimation', 'wrap', 'combinable', 'wrapper', 'element', 'originalElement', 'prepareOptions'];
   function cloneBasicOptions(options)
   {
     var cloneOptions = $.extend({}, options);
@@ -929,16 +932,12 @@
   var origAnimate = $.fn.animate;
   $.fn.animate = function(param1, param2) {
     if(typeof param1 == 'string')
-    {
       animate.call(this, param1, param2);
-      return this;
-    }
     else if(typeof param1 == 'object' && param1.keyframes)
-    {
-      new Action(this, [param1], {}).start();
-      return this;
-    }
-    return origAnimate.apply(this, arguments);
+      new Action(this, [param1], $.cloneBasicOptions(param1)).start();
+    else
+      return origAnimate.apply(this, arguments);
+    return this;
   };
 
   var origStop = $.fn.stop;
@@ -958,11 +957,17 @@
   $.fn.reset = function() {
     if(this.attr('animation-resetable'))
       return this.trigger('animationreset');
+    return this;
   };
 
   $.fn.vendorCss = function(propertyName, value) {
-    this.css(propertyName, value);
-    this.css(vendorPrefix + propertyName, value);
+    if(value === undefined)
+      return this.css(vendorPrefix + propertyName) || this.css(propertyName);
+    else
+    {
+      this.css(propertyName, value);
+      return this.css(vendorPrefix + propertyName, value);
+    }
   };
 
   $.event.special.remove = {

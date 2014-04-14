@@ -1,3 +1,10 @@
+# v0.4.3 / 2014-04-14
+
+* Fix tasks type bug.
+* Add discover plugin.
+* Fix tile plugin fail callback not trigger.
+* Update plugins options.
+
 # v0.4.2 / 2014-04-11
 
 * Fix resize margin bug.
