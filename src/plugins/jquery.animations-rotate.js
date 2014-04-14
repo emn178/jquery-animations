@@ -1,11 +1,12 @@
 ;(function($, window, document, undefined) {
   var keyframes = {
     from: { 
-      transform: 'rotate(0deg)',
-      'transform-origin': '${origin}'
+      transform: 'rotate(${startDeg}deg)',
+      'transform-origin': '${startOrigin}'
     },
     to: { 
-      transform: 'rotate(${degree}deg)',
+      transform: 'rotate(${endDeg}deg)',
+      'transform-origin': '${endOrigin}'
     }
   };
 
@@ -13,8 +14,10 @@
     duration: 1000,
     keyframes: keyframes,
     variables: {
-      degree: 360,
-      origin: '50% 50%'
+      startDeg: 0,
+      endDeg: 360,
+      startOrigin: '50% 50% 0',
+      endOrigin: '50% 50% 0'
     }
   };
 })(jQuery, window, document);
