@@ -1,3 +1,7 @@
+# v0.4.4 / 2014-08-04
+
+* Fix direction option problem when inline animation.
+
 # v0.4.3 / 2014-04-14
 
 * Fix tasks type bug.

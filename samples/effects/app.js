@@ -60,8 +60,12 @@
       if(element.attr('data-type') == 'bool' && value)
         value = value == 'true';
       else if(element.attr('type') == 'number')
+      {
         value = parseFloat(value);
-      if(value !== '' && value !== null && !isNaN(value))
+        if(isNaN(value))
+          return;
+      }
+      if(value !== '' && value !== null)
         options[name] = value;
     });
 

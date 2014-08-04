@@ -934,7 +934,11 @@
     if(typeof param1 == 'string')
       animate.call(this, param1, param2);
     else if(typeof param1 == 'object' && param1.keyframes)
-      new Action(this, [param1], $.cloneBasicOptions(param1)).start();
+    {
+      var options = $.cloneBasicOptions(param1);
+      delete options.direction;
+      new Action(this, [param1], options).start();
+    }
     else
       return origAnimate.apply(this, arguments);
     return this;
