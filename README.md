@@ -221,6 +221,205 @@ $('#want-to-animate').animate('animation1 animation2', {
   // ...
 });
 ```
+## Animations and Options
+##### fadeIn
+No options
+
+##### fadeOut
+No options
+
+##### bounce
+###### *strength: `Number` (default: `20`)*
+Sets the strength of bounce.
+
+##### shake
+###### *strength: `Number` (default: `20`)*
+Sets the strength of shake.
+
+##### slideFromUp
+###### *distance: `Number` (default: `null` as element height)*
+Sets the distance of top position.
+
+##### slideFromDown
+###### *distance: `Number` (default: `null` as element height)*
+Sets the distance of bottom position.
+
+##### slideFromRight
+###### *distance: `Number` (default: `null` as element width)*
+Sets the distance of right position.
+
+##### slideFromLeft
+###### *distance: `Number` (default: `null` as element width)*
+Sets the distance of left position.
+
+##### slideToUp
+###### *distance: `Number` (default: `null` as element height)*
+Sets the distance of top position.
+
+##### slideToDown
+###### *distance: `Number` (default: `null` as element height)*
+Sets the distance of bottom position.
+
+##### slideToRight
+###### *distance: `Number` (default: `null` as element width)*
+Sets the distance of right position.
+
+##### slideToLeft
+###### *distance: `Number` (default: `null` as element width)*
+Sets the distance of left position.
+
+##### flyFromUp
+###### *distance: `Number` (default: `null` as document height)*
+Sets the distance of top position.
+
+##### flyFromDown
+###### *distance: `Number` (default: `null` as document height)*
+Sets the distance of bottom position.
+
+##### flyFromRight
+###### *distance: `Number` (default: `null` as document width)*
+Sets the distance of right position.
+
+##### flyFromLeft
+###### *distance: `Number` (default: `null` as document width)*
+Sets the distance of left position.
+
+##### flyToUp
+###### *distance: `Number` (default: `null` as document height)*
+Sets the distance of top position.
+
+##### flyToDown
+###### *distance: `Number` (default: `null` as document height)*
+Sets the distance of bottom position.
+
+##### flyToRight
+###### *distance: `Number` (default: `null` as document width)*
+Sets the distance of right position.
+
+##### flyToLeft
+###### *distance: `Number` (default: `null` as document width)*
+Sets the distance of left position.
+
+##### flyFrom
+###### *x: `Number` (default: `0`)*
+Sets the position x.
+
+###### *y: `Number` (default: `0`)*
+Sets the position y.
+
+###### *relative: `Boolean` (default: `false`)*
+Specifies position is relative or absolute.
+
+##### flyTo
+###### *x: `Number` (default: `0`)*
+Sets the position x.
+
+###### *y: `Number` (default: `0`)*
+Sets the position y.
+
+###### *relative: `Boolean` (default: `false`)*
+Specifies position is relative or absolute.
+
+##### flyIn
+###### *degree: `Number` (default: `null` as Random)*
+Sets the degree and fly from outside, 0 is right, 90 is top, 180 is left, 270 is bottom.
+
+##### flyOut
+###### *degree: `Number` (default: `null` as Random)*
+Sets the degree and fly to outside, 0 is right, 90 is top, 180 is left, 270 is bottom.
+
+##### rotate
+###### *startDeg: `Number` (default: `0`)*
+Sets the start degree.
+
+###### *endDeg: `Number` (default: `360`)*
+Sets the end degree.
+
+###### *startOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the start origin.
+
+###### *endOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the end origin.
+
+##### zoomAway
+###### *startOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the start origin.
+
+###### *endOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the end origin.
+
+##### zoomNear
+###### *startOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the start origin.
+
+###### *endOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the end origin.
+
+##### zoomIn
+###### *scale: `Number` (default: `1.2`)*
+Sets the scale to zoom.
+
+###### *startOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the start origin.
+
+###### *endOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the end origin.
+
+##### zoomOut
+###### *scale: `Number` (default: `1.2`)*
+Sets the scale to zoom.
+
+###### *startOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the start origin.
+
+###### *endOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the end origin.
+
+##### scaleTo
+###### *x: `Number` (default: `1`)*
+Sets the x scale to zoom.
+
+###### *y: `Number` (default: `1`)*
+Sets the y scale to zoom.
+
+###### *startOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the start origin.
+
+###### *endOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the end origin.
+
+##### scaleFrom
+###### *x: `Number` (default: `1`)*
+Sets the x scale to zoom.
+
+###### *y: `Number` (default: `1`)*
+Sets the y scale to zoom.
+
+###### *startOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the start origin.
+
+###### *endOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the end origin.
+
+##### flipX
+###### *startDeg: `Number` (default: `0`)*
+Sets the start degree.
+
+###### *endDeg: `Number` (default: `360`)*
+Sets the end degree.
+
+###### *startOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the start origin.
+
+###### *endOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the end origin.
+
+###### *perspective: `Number` (default: `100`)*
+Sets the perspective.
+
+###### *perspectiveOrigin: `String` (default: `"50% 50%"`)*
+Sets the perspective origin.
+
 ## Developer Documentation
 Coming soon.
 
