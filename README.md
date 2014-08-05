@@ -420,6 +420,25 @@ Sets the perspective.
 ###### *perspectiveOrigin: `String` (default: `"50% 50%"`)*
 Sets the perspective origin.
 
+##### flipY
+###### *startDeg: `Number` (default: `0`)*
+Sets the start degree.
+
+###### *endDeg: `Number` (default: `360`)*
+Sets the end degree.
+
+###### *startOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the start origin.
+
+###### *endOrigin: `String` (default: `"50% 50% 0"`)*
+Sets the end origin.
+
+###### *perspective: `Number` (default: `100`)*
+Sets the perspective.
+
+###### *perspectiveOrigin: `String` (default: `"50% 50%"`)*
+Sets the perspective origin.
+
 ## Developer Documentation
 Coming soon.
 
