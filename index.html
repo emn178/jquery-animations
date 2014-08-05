@@ -2,9 +2,9 @@
 <html>
 
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="jQuery-animations : A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use." />
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="jQuery-animations : A CSS3 animations development framework based on jQuery provides a easy way to develop cross browser CSS3 animations and use.">
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
@@ -348,6 +348,472 @@
   <span class="c1">// ...</span>
 <span class="p">});</span>
 </pre></div>
+
+<h2>
+<a name="animations-and-options" class="anchor" href="#animations-and-options"><span class="octicon octicon-link"></span></a>Animations and Options</h2>
+
+<h5>
+<a name="fadein" class="anchor" href="#fadein"><span class="octicon octicon-link"></span></a>fadeIn</h5>
+
+<p>No options</p>
+
+<h5>
+<a name="fadeout" class="anchor" href="#fadeout"><span class="octicon octicon-link"></span></a>fadeOut</h5>
+
+<p>No options</p>
+
+<h5>
+<a name="bounce" class="anchor" href="#bounce"><span class="octicon octicon-link"></span></a>bounce</h5>
+
+<h6>
+<a name="strength-number-default-20" class="anchor" href="#strength-number-default-20"><span class="octicon octicon-link"></span></a><em>strength: <code>Number</code> (default: <code>20</code>)</em>
+</h6>
+
+<p>Sets the strength of bounce.</p>
+
+<h5>
+<a name="shake" class="anchor" href="#shake"><span class="octicon octicon-link"></span></a>shake</h5>
+
+<h6>
+<a name="strength-number-default-20-1" class="anchor" href="#strength-number-default-20-1"><span class="octicon octicon-link"></span></a><em>strength: <code>Number</code> (default: <code>20</code>)</em>
+</h6>
+
+<p>Sets the strength of shake.</p>
+
+<h5>
+<a name="slidefromup" class="anchor" href="#slidefromup"><span class="octicon octicon-link"></span></a>slideFromUp</h5>
+
+<h6>
+<a name="distance-number-default-null-as-element-height" class="anchor" href="#distance-number-default-null-as-element-height"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as element height)</em>
+</h6>
+
+<p>Sets the distance of top position.</p>
+
+<h5>
+<a name="slidefromdown" class="anchor" href="#slidefromdown"><span class="octicon octicon-link"></span></a>slideFromDown</h5>
+
+<h6>
+<a name="distance-number-default-null-as-element-height-1" class="anchor" href="#distance-number-default-null-as-element-height-1"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as element height)</em>
+</h6>
+
+<p>Sets the distance of bottom position.</p>
+
+<h5>
+<a name="slidefromright" class="anchor" href="#slidefromright"><span class="octicon octicon-link"></span></a>slideFromRight</h5>
+
+<h6>
+<a name="distance-number-default-null-as-element-width" class="anchor" href="#distance-number-default-null-as-element-width"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as element width)</em>
+</h6>
+
+<p>Sets the distance of right position.</p>
+
+<h5>
+<a name="slidefromleft" class="anchor" href="#slidefromleft"><span class="octicon octicon-link"></span></a>slideFromLeft</h5>
+
+<h6>
+<a name="distance-number-default-null-as-element-width-1" class="anchor" href="#distance-number-default-null-as-element-width-1"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as element width)</em>
+</h6>
+
+<p>Sets the distance of left position.</p>
+
+<h5>
+<a name="slidetoup" class="anchor" href="#slidetoup"><span class="octicon octicon-link"></span></a>slideToUp</h5>
+
+<h6>
+<a name="distance-number-default-null-as-element-height-2" class="anchor" href="#distance-number-default-null-as-element-height-2"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as element height)</em>
+</h6>
+
+<p>Sets the distance of top position.</p>
+
+<h5>
+<a name="slidetodown" class="anchor" href="#slidetodown"><span class="octicon octicon-link"></span></a>slideToDown</h5>
+
+<h6>
+<a name="distance-number-default-null-as-element-height-3" class="anchor" href="#distance-number-default-null-as-element-height-3"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as element height)</em>
+</h6>
+
+<p>Sets the distance of bottom position.</p>
+
+<h5>
+<a name="slidetoright" class="anchor" href="#slidetoright"><span class="octicon octicon-link"></span></a>slideToRight</h5>
+
+<h6>
+<a name="distance-number-default-null-as-element-width-2" class="anchor" href="#distance-number-default-null-as-element-width-2"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as element width)</em>
+</h6>
+
+<p>Sets the distance of right position.</p>
+
+<h5>
+<a name="slidetoleft" class="anchor" href="#slidetoleft"><span class="octicon octicon-link"></span></a>slideToLeft</h5>
+
+<h6>
+<a name="distance-number-default-null-as-element-width-3" class="anchor" href="#distance-number-default-null-as-element-width-3"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as element width)</em>
+</h6>
+
+<p>Sets the distance of left position.</p>
+
+<h5>
+<a name="flyfromup" class="anchor" href="#flyfromup"><span class="octicon octicon-link"></span></a>flyFromUp</h5>
+
+<h6>
+<a name="distance-number-default-null-as-document-height" class="anchor" href="#distance-number-default-null-as-document-height"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as document height)</em>
+</h6>
+
+<p>Sets the distance of top position.</p>
+
+<h5>
+<a name="flyfromdown" class="anchor" href="#flyfromdown"><span class="octicon octicon-link"></span></a>flyFromDown</h5>
+
+<h6>
+<a name="distance-number-default-null-as-document-height-1" class="anchor" href="#distance-number-default-null-as-document-height-1"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as document height)</em>
+</h6>
+
+<p>Sets the distance of bottom position.</p>
+
+<h5>
+<a name="flyfromright" class="anchor" href="#flyfromright"><span class="octicon octicon-link"></span></a>flyFromRight</h5>
+
+<h6>
+<a name="distance-number-default-null-as-document-width" class="anchor" href="#distance-number-default-null-as-document-width"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as document width)</em>
+</h6>
+
+<p>Sets the distance of right position.</p>
+
+<h5>
+<a name="flyfromleft" class="anchor" href="#flyfromleft"><span class="octicon octicon-link"></span></a>flyFromLeft</h5>
+
+<h6>
+<a name="distance-number-default-null-as-document-width-1" class="anchor" href="#distance-number-default-null-as-document-width-1"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as document width)</em>
+</h6>
+
+<p>Sets the distance of left position.</p>
+
+<h5>
+<a name="flytoup" class="anchor" href="#flytoup"><span class="octicon octicon-link"></span></a>flyToUp</h5>
+
+<h6>
+<a name="distance-number-default-null-as-document-height-2" class="anchor" href="#distance-number-default-null-as-document-height-2"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as document height)</em>
+</h6>
+
+<p>Sets the distance of top position.</p>
+
+<h5>
+<a name="flytodown" class="anchor" href="#flytodown"><span class="octicon octicon-link"></span></a>flyToDown</h5>
+
+<h6>
+<a name="distance-number-default-null-as-document-height-3" class="anchor" href="#distance-number-default-null-as-document-height-3"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as document height)</em>
+</h6>
+
+<p>Sets the distance of bottom position.</p>
+
+<h5>
+<a name="flytoright" class="anchor" href="#flytoright"><span class="octicon octicon-link"></span></a>flyToRight</h5>
+
+<h6>
+<a name="distance-number-default-null-as-document-width-2" class="anchor" href="#distance-number-default-null-as-document-width-2"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as document width)</em>
+</h6>
+
+<p>Sets the distance of right position.</p>
+
+<h5>
+<a name="flytoleft" class="anchor" href="#flytoleft"><span class="octicon octicon-link"></span></a>flyToLeft</h5>
+
+<h6>
+<a name="distance-number-default-null-as-document-width-3" class="anchor" href="#distance-number-default-null-as-document-width-3"><span class="octicon octicon-link"></span></a><em>distance: <code>Number</code> (default: <code>null</code> as document width)</em>
+</h6>
+
+<p>Sets the distance of left position.</p>
+
+<h5>
+<a name="flyfrom" class="anchor" href="#flyfrom"><span class="octicon octicon-link"></span></a>flyFrom</h5>
+
+<h6>
+<a name="x-number-default-0" class="anchor" href="#x-number-default-0"><span class="octicon octicon-link"></span></a><em>x: <code>Number</code> (default: <code>0</code>)</em>
+</h6>
+
+<p>Sets the position x.</p>
+
+<h6>
+<a name="y-number-default-0" class="anchor" href="#y-number-default-0"><span class="octicon octicon-link"></span></a><em>y: <code>Number</code> (default: <code>0</code>)</em>
+</h6>
+
+<p>Sets the position y.</p>
+
+<h6>
+<a name="relative-boolean-default-false" class="anchor" href="#relative-boolean-default-false"><span class="octicon octicon-link"></span></a><em>relative: <code>Boolean</code> (default: <code>false</code>)</em>
+</h6>
+
+<p>Specifies position is relative or absolute.</p>
+
+<h5>
+<a name="flyto" class="anchor" href="#flyto"><span class="octicon octicon-link"></span></a>flyTo</h5>
+
+<h6>
+<a name="x-number-default-0-1" class="anchor" href="#x-number-default-0-1"><span class="octicon octicon-link"></span></a><em>x: <code>Number</code> (default: <code>0</code>)</em>
+</h6>
+
+<p>Sets the position x.</p>
+
+<h6>
+<a name="y-number-default-0-1" class="anchor" href="#y-number-default-0-1"><span class="octicon octicon-link"></span></a><em>y: <code>Number</code> (default: <code>0</code>)</em>
+</h6>
+
+<p>Sets the position y.</p>
+
+<h6>
+<a name="relative-boolean-default-false-1" class="anchor" href="#relative-boolean-default-false-1"><span class="octicon octicon-link"></span></a><em>relative: <code>Boolean</code> (default: <code>false</code>)</em>
+</h6>
+
+<p>Specifies position is relative or absolute.</p>
+
+<h5>
+<a name="flyin" class="anchor" href="#flyin"><span class="octicon octicon-link"></span></a>flyIn</h5>
+
+<h6>
+<a name="degree-number-default-null-as-random" class="anchor" href="#degree-number-default-null-as-random"><span class="octicon octicon-link"></span></a><em>degree: <code>Number</code> (default: <code>null</code> as Random)</em>
+</h6>
+
+<p>Sets the degree and fly from outside, 0 is right, 90 is top, 180 is left, 270 is bottom.</p>
+
+<h5>
+<a name="flyout" class="anchor" href="#flyout"><span class="octicon octicon-link"></span></a>flyOut</h5>
+
+<h6>
+<a name="degree-number-default-null-as-random-1" class="anchor" href="#degree-number-default-null-as-random-1"><span class="octicon octicon-link"></span></a><em>degree: <code>Number</code> (default: <code>null</code> as Random)</em>
+</h6>
+
+<p>Sets the degree and fly to outside, 0 is right, 90 is top, 180 is left, 270 is bottom.</p>
+
+<h5>
+<a name="rotate" class="anchor" href="#rotate"><span class="octicon octicon-link"></span></a>rotate</h5>
+
+<h6>
+<a name="startdeg-number-default-0" class="anchor" href="#startdeg-number-default-0"><span class="octicon octicon-link"></span></a><em>startDeg: <code>Number</code> (default: <code>0</code>)</em>
+</h6>
+
+<p>Sets the start degree.</p>
+
+<h6>
+<a name="enddeg-number-default-360" class="anchor" href="#enddeg-number-default-360"><span class="octicon octicon-link"></span></a><em>endDeg: <code>Number</code> (default: <code>360</code>)</em>
+</h6>
+
+<p>Sets the end degree.</p>
+
+<h6>
+<a name="startorigin-string-default-50-50-0" class="anchor" href="#startorigin-string-default-50-50-0"><span class="octicon octicon-link"></span></a><em>startOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the start origin.</p>
+
+<h6>
+<a name="endorigin-string-default-50-50-0" class="anchor" href="#endorigin-string-default-50-50-0"><span class="octicon octicon-link"></span></a><em>endOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the end origin.</p>
+
+<h5>
+<a name="zoomaway" class="anchor" href="#zoomaway"><span class="octicon octicon-link"></span></a>zoomAway</h5>
+
+<h6>
+<a name="startorigin-string-default-50-50-0-1" class="anchor" href="#startorigin-string-default-50-50-0-1"><span class="octicon octicon-link"></span></a><em>startOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the start origin.</p>
+
+<h6>
+<a name="endorigin-string-default-50-50-0-1" class="anchor" href="#endorigin-string-default-50-50-0-1"><span class="octicon octicon-link"></span></a><em>endOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the end origin.</p>
+
+<h5>
+<a name="zoomnear" class="anchor" href="#zoomnear"><span class="octicon octicon-link"></span></a>zoomNear</h5>
+
+<h6>
+<a name="startorigin-string-default-50-50-0-2" class="anchor" href="#startorigin-string-default-50-50-0-2"><span class="octicon octicon-link"></span></a><em>startOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the start origin.</p>
+
+<h6>
+<a name="endorigin-string-default-50-50-0-2" class="anchor" href="#endorigin-string-default-50-50-0-2"><span class="octicon octicon-link"></span></a><em>endOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the end origin.</p>
+
+<h5>
+<a name="zoomin" class="anchor" href="#zoomin"><span class="octicon octicon-link"></span></a>zoomIn</h5>
+
+<h6>
+<a name="scale-number-default-12" class="anchor" href="#scale-number-default-12"><span class="octicon octicon-link"></span></a><em>scale: <code>Number</code> (default: <code>1.2</code>)</em>
+</h6>
+
+<p>Sets the scale to zoom.</p>
+
+<h6>
+<a name="startorigin-string-default-50-50-0-3" class="anchor" href="#startorigin-string-default-50-50-0-3"><span class="octicon octicon-link"></span></a><em>startOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the start origin.</p>
+
+<h6>
+<a name="endorigin-string-default-50-50-0-3" class="anchor" href="#endorigin-string-default-50-50-0-3"><span class="octicon octicon-link"></span></a><em>endOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the end origin.</p>
+
+<h5>
+<a name="zoomout" class="anchor" href="#zoomout"><span class="octicon octicon-link"></span></a>zoomOut</h5>
+
+<h6>
+<a name="scale-number-default-12-1" class="anchor" href="#scale-number-default-12-1"><span class="octicon octicon-link"></span></a><em>scale: <code>Number</code> (default: <code>1.2</code>)</em>
+</h6>
+
+<p>Sets the scale to zoom.</p>
+
+<h6>
+<a name="startorigin-string-default-50-50-0-4" class="anchor" href="#startorigin-string-default-50-50-0-4"><span class="octicon octicon-link"></span></a><em>startOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the start origin.</p>
+
+<h6>
+<a name="endorigin-string-default-50-50-0-4" class="anchor" href="#endorigin-string-default-50-50-0-4"><span class="octicon octicon-link"></span></a><em>endOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the end origin.</p>
+
+<h5>
+<a name="scaleto" class="anchor" href="#scaleto"><span class="octicon octicon-link"></span></a>scaleTo</h5>
+
+<h6>
+<a name="x-number-default-1" class="anchor" href="#x-number-default-1"><span class="octicon octicon-link"></span></a><em>x: <code>Number</code> (default: <code>1</code>)</em>
+</h6>
+
+<p>Sets the x scale to zoom.</p>
+
+<h6>
+<a name="y-number-default-1" class="anchor" href="#y-number-default-1"><span class="octicon octicon-link"></span></a><em>y: <code>Number</code> (default: <code>1</code>)</em>
+</h6>
+
+<p>Sets the y scale to zoom.</p>
+
+<h6>
+<a name="startorigin-string-default-50-50-0-5" class="anchor" href="#startorigin-string-default-50-50-0-5"><span class="octicon octicon-link"></span></a><em>startOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the start origin.</p>
+
+<h6>
+<a name="endorigin-string-default-50-50-0-5" class="anchor" href="#endorigin-string-default-50-50-0-5"><span class="octicon octicon-link"></span></a><em>endOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the end origin.</p>
+
+<h5>
+<a name="scalefrom" class="anchor" href="#scalefrom"><span class="octicon octicon-link"></span></a>scaleFrom</h5>
+
+<h6>
+<a name="x-number-default-1-1" class="anchor" href="#x-number-default-1-1"><span class="octicon octicon-link"></span></a><em>x: <code>Number</code> (default: <code>1</code>)</em>
+</h6>
+
+<p>Sets the x scale to zoom.</p>
+
+<h6>
+<a name="y-number-default-1-1" class="anchor" href="#y-number-default-1-1"><span class="octicon octicon-link"></span></a><em>y: <code>Number</code> (default: <code>1</code>)</em>
+</h6>
+
+<p>Sets the y scale to zoom.</p>
+
+<h6>
+<a name="startorigin-string-default-50-50-0-6" class="anchor" href="#startorigin-string-default-50-50-0-6"><span class="octicon octicon-link"></span></a><em>startOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the start origin.</p>
+
+<h6>
+<a name="endorigin-string-default-50-50-0-6" class="anchor" href="#endorigin-string-default-50-50-0-6"><span class="octicon octicon-link"></span></a><em>endOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the end origin.</p>
+
+<h5>
+<a name="flipx" class="anchor" href="#flipx"><span class="octicon octicon-link"></span></a>flipX</h5>
+
+<h6>
+<a name="startdeg-number-default-0-1" class="anchor" href="#startdeg-number-default-0-1"><span class="octicon octicon-link"></span></a><em>startDeg: <code>Number</code> (default: <code>0</code>)</em>
+</h6>
+
+<p>Sets the start degree.</p>
+
+<h6>
+<a name="enddeg-number-default-360-1" class="anchor" href="#enddeg-number-default-360-1"><span class="octicon octicon-link"></span></a><em>endDeg: <code>Number</code> (default: <code>360</code>)</em>
+</h6>
+
+<p>Sets the end degree.</p>
+
+<h6>
+<a name="startorigin-string-default-50-50-0-7" class="anchor" href="#startorigin-string-default-50-50-0-7"><span class="octicon octicon-link"></span></a><em>startOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the start origin.</p>
+
+<h6>
+<a name="endorigin-string-default-50-50-0-7" class="anchor" href="#endorigin-string-default-50-50-0-7"><span class="octicon octicon-link"></span></a><em>endOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the end origin.</p>
+
+<h6>
+<a name="perspective-number-default-100" class="anchor" href="#perspective-number-default-100"><span class="octicon octicon-link"></span></a><em>perspective: <code>Number</code> (default: <code>100</code>)</em>
+</h6>
+
+<p>Sets the perspective.</p>
+
+<h6>
+<a name="perspectiveorigin-string-default-50-50" class="anchor" href="#perspectiveorigin-string-default-50-50"><span class="octicon octicon-link"></span></a><em>perspectiveOrigin: <code>String</code> (default: <code>"50% 50%"</code>)</em>
+</h6>
+
+<p>Sets the perspective origin.</p>
+
+<h5>
+<a name="flipy" class="anchor" href="#flipy"><span class="octicon octicon-link"></span></a>flipY</h5>
+
+<h6>
+<a name="startdeg-number-default-0-2" class="anchor" href="#startdeg-number-default-0-2"><span class="octicon octicon-link"></span></a><em>startDeg: <code>Number</code> (default: <code>0</code>)</em>
+</h6>
+
+<p>Sets the start degree.</p>
+
+<h6>
+<a name="enddeg-number-default-360-2" class="anchor" href="#enddeg-number-default-360-2"><span class="octicon octicon-link"></span></a><em>endDeg: <code>Number</code> (default: <code>360</code>)</em>
+</h6>
+
+<p>Sets the end degree.</p>
+
+<h6>
+<a name="startorigin-string-default-50-50-0-8" class="anchor" href="#startorigin-string-default-50-50-0-8"><span class="octicon octicon-link"></span></a><em>startOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the start origin.</p>
+
+<h6>
+<a name="endorigin-string-default-50-50-0-8" class="anchor" href="#endorigin-string-default-50-50-0-8"><span class="octicon octicon-link"></span></a><em>endOrigin: <code>String</code> (default: <code>"50% 50% 0"</code>)</em>
+</h6>
+
+<p>Sets the end origin.</p>
+
+<h6>
+<a name="perspective-number-default-100-1" class="anchor" href="#perspective-number-default-100-1"><span class="octicon octicon-link"></span></a><em>perspective: <code>Number</code> (default: <code>100</code>)</em>
+</h6>
+
+<p>Sets the perspective.</p>
+
+<h6>
+<a name="perspectiveorigin-string-default-50-50-1" class="anchor" href="#perspectiveorigin-string-default-50-50-1"><span class="octicon octicon-link"></span></a><em>perspectiveOrigin: <code>String</code> (default: <code>"50% 50%"</code>)</em>
+</h6>
+
+<p>Sets the perspective origin.</p>
 
 <h2>
 <a name="developer-documentation" class="anchor" href="#developer-documentation"><span class="octicon octicon-link"></span></a>Developer Documentation</h2>
