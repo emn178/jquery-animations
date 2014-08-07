@@ -94,7 +94,7 @@
       options.delay = options.delay || animation.delay || 0;
       options.repeat = options.repeat || animation.repeat || 1;
       options.fillMode = options.fillMode || animation.fillMode || 'none';
-      options.timeout = options.timeout || 500;
+      options.timeout = options.timeout || animation.timeout || 500;
       options.prepare = [options.prepare, animation.prepare];
       options.start = [options.start, animation.start];
       options.complete = [animation.complete, options.complete];
@@ -521,7 +521,7 @@
         options.delay / 1000 + 's', 
         options.remainingRepeat, 
         options.direction,
-        options.fillMode,
+        options.fillMode
       ].join(' '));
     }
     return properties.join(',');
@@ -991,7 +991,7 @@
         display: '',
         width: '',
         height: '',
-        float: '',
+        'float': '',
         position: '',
         margin: ''
       });
