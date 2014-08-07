@@ -11,7 +11,6 @@ For the developer, it could be easy to develop cross browser CSS3 animations by 
 
 ## Demo
 [Effects](http://emn178.github.io/jquery-animations/samples/effects/)  
-[Tile](http://emn178.github.io/jquery-animations/samples/tile/)  
 [Integrate with CSS Library](http://jsfiddle.net/emn178/vN8V8/)
 
 ## Browser Support
@@ -58,6 +57,9 @@ Available values please refer to [animation-direction](http://www.w3schools.com/
 Sets the property specifies what styles will apply for the element when the animation is not playing. You can use `reset()` method to clear the state after `forwards` or `both`.
 
 Available values please refer to [animation-fill-mode](http://www.w3schools.com/cssref/css3_pr_animation-fill-mode.asp)
+
+###### *timeout: `Number` (default: `500`)*
+Sets the number determining the how long to trigger fail if animation does not run.
 
 ###### *combinable: `Boolean` (default: `false`)*
 Sets the flag determining the animation combines with other animations. It will stop running animation when sets false.

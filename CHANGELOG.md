@@ -1,3 +1,8 @@
+# v0.4.5 / 2014-08-07
+
+* Separate jquery-animations-tile and jquery-animations-discover.
+* Update timeout options.
+
 # v0.4.4 / 2014-08-04
 
 * Fix direction option problem when inline animation.
