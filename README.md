@@ -31,7 +31,7 @@ Sets the animation ID(s) or name(s) you want to perform. It could be a mutiple a
 
 Available animations please refer to [Effects](http://emn178.github.io/jquery-animations/samples/effects/).
 
-ID means that predined in JavaScript plugins, and name means that declares in CSS.
+ID means that predined in JavaScript plugins, and name means that declares in [CSS](https://www.scaler.com/topics/css/).
 
 ##### *options: `Object`*
 Sets the animations options.
